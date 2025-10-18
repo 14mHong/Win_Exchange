@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cex_postgres
+    environment:
+      POSTGRES_DB: cex_db
+      POSTGRES_USER: cex_user
+      POSTGRES_PASSWORD: cex_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./packages/backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cex_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: cex_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cex_network
+    command: redis-server --appendonly yes
+
+  backend:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    container_name: cex_backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      # Override specific values for Docker networking
+      DATABASE_URL: postgresql://cex_user:cex_password@postgres:5432/cex_db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+    volumes:
+      - ./packages/backend:/app
+      - /app/node_modules
+    networks:
+      - cex_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./packages/frontend
+      dockerfile: Dockerfile
+    container_name: cex_frontend
+    ports:
+      - "5173:80"
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    volumes:
+      - ./packages/frontend:/app
+      - /app/node_modules
+    networks:
+      - cex_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  cex_network:
+    driver: bridge

@@ -1,0 +1,148 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: cex-postgres
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile.postgres
+    dockerContext: .
+    envVars:
+      - key: POSTGRES_DB
+        value: cex_db
+      - key: POSTGRES_USER
+        generateValue: true
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+    disk:
+      name: postgres-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1
+
+  # Redis Cache
+  - type: redis
+    name: cex-redis
+    plan: free
+    region: oregon
+    ipAllowList: []
+
+  # Backend API
+  - type: web
+    name: cex-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd packages/backend && npm install
+    startCommand: cd packages/backend && npm start
+    healthCheckPath: /health
+    envVars:
+      # Database
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cex-postgres
+          property: connectionString
+
+      # Redis
+      - key: REDIS_URL
+        fromService:
+          name: cex-redis
+          type: redis
+          property: connectionString
+
+      # JWT
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 24h
+
+      # Server
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: LOG_LEVEL
+        value: info
+
+      # Frontend URL (will be updated after frontend deployment)
+      - key: FRONTEND_URL
+        sync: false
+
+      # Twilio (SMS verification)
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+
+      # SendGrid (Email)
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
+
+      # Google OAuth
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+
+      # Security
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+      - key: ENCRYPTION_KEY
+        generateValue: true
+
+      # Blockchain
+      - key: MASTER_SEED_MNEMONIC
+        sync: false
+      - key: ETHEREUM_RPC_URL
+        sync: false
+      - key: BLOCKCYPHER_API_URL_LTC
+        value: https://api.blockcypher.com/v1/ltc/main
+      - key: BLOCKCYPHER_TOKEN
+        sync: false
+      - key: BINANCE_SMART_CHAIN_RPC
+        value: https://bsc-dataseed.binance.org/
+      - key: POLYGON_RPC_URL
+        value: https://polygon-rpc.com/
+      - key: ENABLE_BLOCKCHAIN_MONITORING
+        value: true
+      - key: BLOCKCHAIN_MONITOR_INTERVAL
+        value: 15000
+
+  # Frontend Static Site
+  - type: web
+    name: cex-frontend
+    env: static
+    region: oregon
+    plan: free
+    buildCommand: cd packages/frontend && npm install && npm run build
+    staticPublishPath: packages/frontend/dist
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: cex-backend
+          type: web
+          property: host
+      - key: VITE_WS_URL
+        fromService:
+          name: cex-backend
+          type: web
+          property: host
+
+databases:
+  - name: cex-postgres
+    databaseName: cex_db
+    user: cex_user
+    plan: free
+    region: oregon

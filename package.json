@@ -1,0 +1,25 @@
+{
+  "name": "cex-mvp",
+  "version": "1.0.0",
+  "description": "Centralized Cryptocurrency Exchange MVP",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "test": "npm run test -w backend && npm run test -w frontend",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "install:all": "npm install && npm run install -w backend && npm run install -w frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["cryptocurrency", "exchange", "trading", "mvp"],
+  "author": "CEX MVP Team",
+  "license": "MIT"
+}
