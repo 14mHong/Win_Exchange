@@ -509,7 +509,7 @@ class AuthController {
       req.session.oauthState = state;
 
       // Backend OAuth callback URL (where Google redirects after auth)
-      const backendUrl = process.env.VITE_API_URL || process.env.BACKEND_URL || 'http://localhost:3000';
+      const backendUrl = process.env.BACKEND_URL || 'https://win-exchange-bdmv.onrender.com';
       const redirectUri = `${backendUrl}/api/auth/oauth/google/callback`;
 
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
@@ -567,7 +567,7 @@ class AuthController {
       const querystring = require('querystring');
 
       // Must match the redirect_uri used in initiateOAuth
-      const backendUrl = process.env.VITE_API_URL || process.env.BACKEND_URL || 'http://localhost:3000';
+      const backendUrl = process.env.BACKEND_URL || 'https://win-exchange-bdmv.onrender.com';
       const redirectUri = `${backendUrl}/api/auth/oauth/google/callback`;
 
       const tokenParams = querystring.stringify({
