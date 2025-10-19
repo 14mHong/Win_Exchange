@@ -508,9 +508,13 @@ class AuthController {
       req.session = req.session || {};
       req.session.oauthState = state;
 
+      // Backend OAuth callback URL (where Google redirects after auth)
+      const backendUrl = process.env.VITE_API_URL || process.env.BACKEND_URL || 'http://localhost:3000';
+      const redirectUri = `${backendUrl}/api/auth/oauth/google/callback`;
+
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${process.env.GOOGLE_CLIENT_ID}&` +
-        `redirect_uri=${encodeURIComponent(process.env.FRONTEND_URL || 'http://localhost:5173')}/auth/callback/google&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
         `response_type=code&` +
         `scope=${encodeURIComponent('openid profile email')}&` +
         `state=${state}`;
@@ -562,12 +566,16 @@ class AuthController {
       const https = require('https');
       const querystring = require('querystring');
 
+      // Must match the redirect_uri used in initiateOAuth
+      const backendUrl = process.env.VITE_API_URL || process.env.BACKEND_URL || 'http://localhost:3000';
+      const redirectUri = `${backendUrl}/api/auth/oauth/google/callback`;
+
       const tokenParams = querystring.stringify({
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         code,
         grant_type: 'authorization_code',
-        redirect_uri: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback/google`
+        redirect_uri: redirectUri
       });
 
       const tokenResponse = await new Promise((resolve, reject) => {
