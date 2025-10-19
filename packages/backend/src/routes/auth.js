@@ -49,6 +49,9 @@ router.post('/reset-password/confirm', authLimiter, AuthController.confirmPasswo
 // OAuth routes (public)
 // No rate limiting on OAuth initiation since it just generates a redirect URL
 router.get('/oauth/:provider', AuthController.initiateOAuth);
+// Google redirects here with GET request (query params: code, state)
+router.get('/oauth/:provider/callback', authLimiter, AuthController.handleOAuthCallback);
+// Also support POST for manual callback handling
 router.post('/oauth/:provider/callback', authLimiter, AuthController.handleOAuthCallback);
 
 // Protected routes (authentication required)

@@ -508,9 +508,9 @@ class AuthController {
       req.session = req.session || {};
       req.session.oauthState = state;
 
-      // Frontend OAuth callback URL (where Google redirects after auth)
-      const frontendUrl = process.env.FRONTEND_URL || 'https://win-exchange-frontend.onrender.com';
-      const redirectUri = `${frontendUrl}/auth/callback/google`;
+      // Backend OAuth callback URL (where Google redirects after auth)
+      const backendUrl = process.env.BACKEND_URL || 'https://win-exchange-bdmv.onrender.com';
+      const redirectUri = `${backendUrl}/api/auth/oauth/google/callback`;
 
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${process.env.GOOGLE_CLIENT_ID}&` +
@@ -538,7 +538,9 @@ class AuthController {
   static async handleOAuthCallback(req, res) {
     try {
       const { provider } = req.params;
-      const { code, state } = req.body;
+      // Support both query params (GET from Google) and body params (POST from frontend)
+      const code = req.query.code || req.body.code;
+      const state = req.query.state || req.body.state;
 
       if (!code) {
         return res.status(400).json({
@@ -567,8 +569,8 @@ class AuthController {
       const querystring = require('querystring');
 
       // Must match the redirect_uri used in initiateOAuth
-      const frontendUrl = process.env.FRONTEND_URL || 'https://win-exchange-frontend.onrender.com';
-      const redirectUri = `${frontendUrl}/auth/callback/google`;
+      const backendUrl = process.env.BACKEND_URL || 'https://win-exchange-bdmv.onrender.com';
+      const redirectUri = `${backendUrl}/api/auth/oauth/google/callback`;
 
       const tokenParams = querystring.stringify({
         client_id: process.env.GOOGLE_CLIENT_ID,
@@ -673,6 +675,14 @@ class AuthController {
         userAgent: req.get('User-Agent')
       });
 
+      // If this is a GET request (from Google redirect), redirect to frontend with token
+      if (req.method === 'GET') {
+        const frontendUrl = process.env.FRONTEND_URL || 'https://win-exchange-frontend.onrender.com';
+        const redirectUrl = `${frontendUrl}/auth/oauth-success?token=${encodeURIComponent(token)}&provider=${provider}`;
+        return res.redirect(redirectUrl);
+      }
+
+      // If this is a POST request (from frontend), return JSON
       res.json({
         success: true,
         message: `Successfully authenticated with ${provider}`,

@@ -16,6 +16,7 @@ const VerifyEmail = () => import('@/views/auth/VerifyEmail.vue')
 const VerifyPhone = () => import('@/views/auth/VerifyPhone.vue')
 const Setup2FA = () => import('@/views/auth/Setup2FA.vue')
 const OAuthCallback = () => import('@/views/auth/OAuthCallback.vue')
+const OAuthSuccess = () => import('@/views/auth/OAuthSuccess.vue')
 
 // Public pages
 const LandingPage = () => import('@/views/LandingPage.vue')
@@ -108,9 +109,19 @@ const routes = [
     path: '/auth/callback/:provider',
     name: 'OAuthCallback',
     component: OAuthCallback,
-    meta: { 
+    meta: {
       requiresGuest: true,
       title: 'Authenticating... - Win Exchange'
+    }
+  },
+
+  // OAuth success route (from backend redirect)
+  {
+    path: '/auth/oauth-success',
+    name: 'OAuthSuccess',
+    component: OAuthSuccess,
+    meta: {
+      title: 'Login Successful - Win Exchange'
     }
   },
 
