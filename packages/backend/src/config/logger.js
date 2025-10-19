@@ -1,4 +1,16 @@
 const winston = require('winston');
+const fs = require('fs');
+const path = require('path');
+
+// Ensure logs directory exists
+const logsDir = path.join(process.cwd(), 'logs');
+if (!fs.existsSync(logsDir)) {
+  try {
+    fs.mkdirSync(logsDir, { recursive: true });
+  } catch (err) {
+    console.error('Failed to create logs directory:', err.message);
+  }
+}
 
 // Define log format
 const logFormat = winston.format.combine(
@@ -40,15 +52,13 @@ const logger = winston.createLogger({
   ]
 });
 
-// If we're not in production, also log to console
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple()
-    )
-  }));
-}
+// Always log to console (Render needs this to show logs)
+logger.add(new winston.transports.Console({
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.simple()
+  )
+}));
 
 // Helper functions for different log levels
 const logHelpers = {

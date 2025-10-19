@@ -1,9 +1,24 @@
+// Debug logging before anything else
+console.log('========================================');
+console.log('Starting Win Exchange Backend...');
+console.log('Node version:', process.version);
+console.log('Environment:', process.env.NODE_ENV);
+console.log('PORT:', process.env.PORT);
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('REDIS_URL exists:', !!process.env.REDIS_URL);
+console.log('========================================');
+
 const http = require('http');
 const socketIo = require('socket.io');
 
 // Import configurations (lazily loaded to avoid test issues)
+console.log('Loading logger...');
 const logger = require('./config/logger');
+console.log('✓ Logger loaded');
+
+console.log('Loading app...');
 const { createApp } = require('./app');
+console.log('✓ App loaded');
 
 // Import middleware
 const { corsOptions } = require('./middleware/security');
@@ -11,18 +26,30 @@ const { corsOptions } = require('./middleware/security');
 // Import services
 let TradingEngine, limitOrderMonitor, utxoMonitor, blockchainMonitor, winPriceSimulator;
 try {
+  console.log('Loading TradingEngine...');
   logger.info('Loading TradingEngine...');
   TradingEngine = require('./services/TradingEngine');
+
+  console.log('Loading LimitOrderMonitor...');
   logger.info('Loading LimitOrderMonitor...');
   limitOrderMonitor = require('./services/LimitOrderMonitor');
+
+  console.log('Loading UTXOMonitor...');
   logger.info('Loading UTXOMonitor...');
   utxoMonitor = require('./services/UTXOMonitor');
+
+  console.log('Loading BlockchainMonitorService...');
   logger.info('Loading BlockchainMonitorService...');
   blockchainMonitor = require('./services/BlockchainMonitorService');
+
+  console.log('Loading WinPriceSimulator...');
   logger.info('Loading WinPriceSimulator...');
   winPriceSimulator = require('./services/WinPriceSimulator');
+
+  console.log('✓ All services loaded successfully');
   logger.info('All services loaded successfully');
 } catch (error) {
+  console.error('✗ Error loading services:', error);
   logger.error('Error loading services:', error);
   process.exit(1);
 }
