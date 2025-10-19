@@ -2,21 +2,17 @@ const redis = require('redis');
 const logger = require('./logger');
 
 const client = redis.createClient({
-  url: process.env.REDIS_URL,
-  retry_strategy: (options) => {
-    if (options.error && options.error.code === 'ECONNREFUSED') {
-      logger.error('Redis server connection refused');
-      return new Error('Redis server connection refused');
+  url: process.env.REDIS_URL || 'redis://localhost:6379',
+  socket: {
+    reconnectStrategy: (retries) => {
+      if (retries > 10) {
+        logger.error('Too many Redis connection attempts');
+        return new Error('Too many retries');
+      }
+      const delay = Math.min(retries * 100, 3000);
+      logger.info(`Redis reconnecting in ${delay}ms (attempt ${retries})`);
+      return delay;
     }
-    if (options.total_retry_time > 1000 * 60 * 60) {
-      logger.error('Redis retry time exhausted');
-      return new Error('Retry time exhausted');
-    }
-    if (options.attempt > 10) {
-      logger.error('Too many Redis connection attempts');
-      return undefined;
-    }
-    return Math.min(options.attempt * 100, 3000);
   }
 });
 
