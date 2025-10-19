@@ -693,9 +693,18 @@ class AuthController {
 
     } catch (error) {
       logger.error('OAuth callback error:', error);
+
+      // If this is a GET request (from Google), redirect to frontend with error
+      if (req.method === 'GET') {
+        const frontendUrl = process.env.FRONTEND_URL || 'https://win-exchange-frontend.onrender.com';
+        const errorMsg = encodeURIComponent(error.message || 'Failed to handle OAuth callback');
+        return res.redirect(`${frontendUrl}/login?error=${errorMsg}`);
+      }
+
+      // If this is a POST request, return JSON error
       res.status(500).json({
         success: false,
-        error: 'Failed to handle OAuth callback'
+        error: error.message || 'Failed to handle OAuth callback'
       });
     }
   }
