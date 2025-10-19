@@ -508,9 +508,9 @@ class AuthController {
       req.session = req.session || {};
       req.session.oauthState = state;
 
-      // Backend OAuth callback URL (where Google redirects after auth)
-      const backendUrl = process.env.BACKEND_URL || 'https://win-exchange-bdmv.onrender.com';
-      const redirectUri = `${backendUrl}/api/auth/oauth/google/callback`;
+      // Frontend OAuth callback URL (where Google redirects after auth)
+      const frontendUrl = process.env.FRONTEND_URL || 'https://win-exchange-frontend.onrender.com';
+      const redirectUri = `${frontendUrl}/auth/callback/google`;
 
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${process.env.GOOGLE_CLIENT_ID}&` +
@@ -567,8 +567,8 @@ class AuthController {
       const querystring = require('querystring');
 
       // Must match the redirect_uri used in initiateOAuth
-      const backendUrl = process.env.BACKEND_URL || 'https://win-exchange-bdmv.onrender.com';
-      const redirectUri = `${backendUrl}/api/auth/oauth/google/callback`;
+      const frontendUrl = process.env.FRONTEND_URL || 'https://win-exchange-frontend.onrender.com';
+      const redirectUri = `${frontendUrl}/auth/callback/google`;
 
       const tokenParams = querystring.stringify({
         client_id: process.env.GOOGLE_CLIENT_ID,
