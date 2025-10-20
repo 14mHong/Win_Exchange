@@ -29,4 +29,4 @@ app.config.globalProperties.$apiUrl = import.meta.env.VITE_API_URL || 'http://lo
 app.config.globalProperties.$wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3000'
 
 // Mount app
-app.mount('#app')
+app.mount('#app')// Force rebuild Mon 20 Oct 2025 02:27:37 WAT
