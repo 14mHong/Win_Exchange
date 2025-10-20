@@ -50,22 +50,40 @@ class SwapController {
       }
 
       const symbolArray = symbols.split(',').map(s => s.trim().toUpperCase());
+      console.log('[SwapController] Fetching prices for symbols:', symbolArray);
 
       // Separate WIN token from other tokens
       const hasWin = symbolArray.includes('WIN');
       const otherSymbols = symbolArray.filter(s => s !== 'WIN');
 
+      let prices = {};
+
       // Get prices for non-WIN tokens from CoinGecko
-      const prices = otherSymbols.length > 0
-        ? await coinGeckoService.getPrices(otherSymbols)
-        : {};
+      if (otherSymbols.length > 0) {
+        try {
+          prices = await coinGeckoService.getPrices(otherSymbols);
+          console.log('[SwapController] CoinGecko prices fetched:', prices);
+        } catch (coinGeckoError) {
+          console.error('[SwapController] CoinGecko error:', coinGeckoError);
+          // Return mock prices as fallback
+          otherSymbols.forEach(symbol => {
+            prices[symbol] = 0; // Indicate price unavailable
+          });
+        }
+      }
 
       // Add WIN price if requested
       if (hasWin) {
-        const WinToken = require('../models/WinToken');
-        const winConfig = await WinToken.getConfig();
-        if (winConfig) {
-          prices.WIN = parseFloat(winConfig.current_price);
+        try {
+          const WinToken = require('../models/WinToken');
+          const winConfig = await WinToken.getConfig();
+          if (winConfig) {
+            prices.WIN = parseFloat(winConfig.current_price);
+            console.log('[SwapController] WIN price added:', prices.WIN);
+          }
+        } catch (winError) {
+          console.error('[SwapController] WIN token error:', winError);
+          prices.WIN = 0;
         }
       }
 
@@ -75,7 +93,7 @@ class SwapController {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      console.error('Get prices error:', error);
+      console.error('[SwapController] Get prices error:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to fetch prices'

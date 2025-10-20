@@ -123,8 +123,14 @@ class CoinGeckoService {
       this.setCache(cacheKey, prices);
       return prices;
     } catch (error) {
-      console.error('Error fetching multiple prices:', error.message);
-      throw new Error('Failed to fetch prices');
+      console.error('Error fetching multiple prices:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        symbols,
+        coinIds
+      });
+      throw new Error(`Failed to fetch prices: ${error.message}`);
     }
   }
 
