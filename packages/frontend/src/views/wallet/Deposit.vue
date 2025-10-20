@@ -149,7 +149,8 @@ const supportedCurrencies = ref([]);
 // Fetch supported currencies
 const fetchSupportedCurrencies = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/wallet/currencies', {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const response = await fetch(`${apiUrl}/api/wallet/currencies`, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`
       }
@@ -184,8 +185,9 @@ const generateAddress = async () => {
   depositAddress.value = '';
 
   try {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const response = await fetch(
-      `http://localhost:3000/api/wallet/deposit/${selectedCurrency.value}/address`,
+      `${apiUrl}/api/wallet/deposit/${selectedCurrency.value}/address`,
       {
         headers: {
           'Authorization': `Bearer ${authStore.token}`
