@@ -143,13 +143,17 @@ class UTXOService {
     let estimatedFee = 0;
 
     // Estimate transaction size and fee
-    // Formula: (inputs * 148) + (outputs * 34) + 10
+    // Native SegWit (P2WPKH) formula in virtual bytes:
+    // - Input: ~68 vbytes (vs 148 for P2PKH)
+    // - Output: ~31 vbytes (vs 34 for P2PKH)
+    // - Overhead: ~10.5 vbytes
     for (const utxo of availableUTXOs) {
       selectedUTXOs.push(utxo);
       totalSelected += parseInt(utxo.amount_satoshi);
 
       // Recalculate fee with current number of inputs
-      const txSize = (selectedUTXOs.length * 148) + (2 * 34) + 10; // 2 outputs (recipient + change)
+      // Using SegWit (P2WPKH) sizing
+      const txSize = Math.ceil((selectedUTXOs.length * 68) + (2 * 31) + 10.5); // 2 outputs (recipient + change)
       estimatedFee = Math.ceil(txSize * feeRate);
 
       // Check if we have enough (amount + fee)

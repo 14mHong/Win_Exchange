@@ -173,8 +173,9 @@ class CryptoWalletService {
         ? this.networks[`${currency}_TESTNET`]
         : this.networks[currency];
 
-      // P2PKH address (legacy format: 1...)
-      const { address } = bitcoin.payments.p2pkh({
+      // P2WPKH address (Native SegWit - bech32 format)
+      // BTC: bc1..., LTC: ltc1...
+      const { address } = bitcoin.payments.p2wpkh({
         pubkey: child.publicKey,
         network
       });
