@@ -16,6 +16,7 @@
     "db:reset": "node scripts/reset-db.js"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
     "bip32": "^5.0.0",

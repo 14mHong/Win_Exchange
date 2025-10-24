@@ -1,21 +1,16 @@
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const logger = require('../config/logger');
 
 class EmailService {
   constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.sendgrid.net',
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER || 'apikey',
-        pass: process.env.SENDGRID_API_KEY
-      },
-      // Add timeout configurations to prevent hanging
-      connectionTimeout: 10000, // 10 seconds to establish connection
-      greetingTimeout: 5000,    // 5 seconds for greeting
-      socketTimeout: 15000      // 15 seconds for socket inactivity
-    });
+    // Use SendGrid Web API instead of SMTP (avoids port blocking issues)
+    const apiKey = process.env.SENDGRID_API_KEY;
+    if (apiKey) {
+      sgMail.setApiKey(apiKey);
+      logger.info('SendGrid API initialized');
+    } else {
+      logger.warn('SENDGRID_API_KEY not configured - emails will not be sent');
+    }
   }
 
   static getInstance() {
@@ -27,26 +22,35 @@ class EmailService {
 
   async sendEmail({ to, subject, html, text }) {
     try {
-      const mailOptions = {
-        from: process.env.FROM_EMAIL || 'noreply@yourexchange.com',
+      if (!process.env.SENDGRID_API_KEY) {
+        throw new Error('SendGrid API key not configured');
+      }
+
+      const msg = {
         to,
+        from: process.env.FROM_EMAIL || 'noreply@yourexchange.com',
         subject,
-        html,
-        text
+        text,
+        html
       };
 
-      const result = await this.transporter.sendMail(mailOptions);
-      logger.info('Email sent successfully', { to, subject, messageId: result.messageId });
-      return { success: true, messageId: result.messageId };
+      const result = await sgMail.send(msg);
+      logger.info('Email sent successfully', {
+        to,
+        subject,
+        statusCode: result[0].statusCode
+      });
+      return {
+        success: true,
+        messageId: result[0].headers['x-message-id']
+      };
     } catch (error) {
       logger.error('Email sending failed', {
         to,
         subject,
         error: error.message,
         code: error.code,
-        response: error.response,
-        responseCode: error.responseCode,
-        command: error.command
+        response: error.response?.body
       });
       // Throw the original error with more context
       const enhancedError = new Error(`Failed to send email: ${error.message}`);
