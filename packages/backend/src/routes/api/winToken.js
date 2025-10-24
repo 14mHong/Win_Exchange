@@ -65,14 +65,14 @@ router.get('/market', async (req, res) => {
  * GET /api/win-token/chart/:timeframe
  * Get WIN token price history for charting
  *
- * Supported timeframes: 1m, 5m, 15m, 1h, 4h, 1d
+ * Supported timeframes: 1m, 5m, 15m, 30m, 1h, 4h, 1d
  */
 router.get('/chart/:timeframe', async (req, res) => {
   try {
     const { timeframe } = req.params;
     const limit = parseInt(req.query.limit) || 100;
 
-    const validTimeframes = ['1m', '5m', '15m', '1h', '4h', '1d'];
+    const validTimeframes = ['1m', '5m', '15m', '30m', '1h', '4h', '1d'];
     if (!validTimeframes.includes(timeframe)) {
       return res.status(400).json({
         success: false,
