@@ -10,7 +10,11 @@ class EmailService {
       auth: {
         user: process.env.SMTP_USER || 'apikey',
         pass: process.env.SENDGRID_API_KEY
-      }
+      },
+      // Add timeout configurations to prevent hanging
+      connectionTimeout: 10000, // 10 seconds to establish connection
+      greetingTimeout: 5000,    // 5 seconds for greeting
+      socketTimeout: 15000      // 15 seconds for socket inactivity
     });
   }
 
