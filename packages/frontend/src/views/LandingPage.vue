@@ -297,6 +297,8 @@ export default {
 
     // Time ranges for WIN chart
     const timeRanges = [
+      { label: '5M', value: '5m', timeframe: '5m', limit: 60 },
+      { label: '30M', value: '30m', timeframe: '30m', limit: 60 },
       { label: '1H', value: '1h', timeframe: '1h', limit: 60 },
       { label: '4H', value: '4h', timeframe: '4h', limit: 48 },
       { label: '1D', value: '1d', timeframe: '1h', limit: 24 },
