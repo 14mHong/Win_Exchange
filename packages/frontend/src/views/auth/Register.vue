@@ -192,6 +192,37 @@
               {{ errors.confirmPassword }}
             </p>
           </div>
+
+          <!-- Invite Code -->
+          <div>
+            <label
+              for="invite_code"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Invite Code
+            </label>
+            <input
+              id="invite_code"
+              v-model="form.invite_code"
+              type="text"
+              required
+              :class="[
+                'input mt-1 uppercase',
+                errors.invite_code ? 'input-error' : ''
+              ]"
+              placeholder="Enter your invite code (e.g., WIN-XXXX-YYYY)"
+              maxlength="20"
+            >
+            <p
+              v-if="errors.invite_code"
+              class="mt-1 text-sm text-danger-600"
+            >
+              {{ errors.invite_code }}
+            </p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Registration is by invitation only. Enter the code you received.
+            </p>
+          </div>
         </div>
 
         <!-- Terms and Conditions -->
@@ -324,6 +355,7 @@ export default {
       last_name: '',
       password: '',
       confirmPassword: '',
+      invite_code: '',
       acceptTerms: false
     })
 
@@ -366,6 +398,12 @@ export default {
         newErrors.confirmPassword = 'Please confirm your password'
       } else if (form.password !== form.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match'
+      }
+
+      if (!form.invite_code) {
+        newErrors.invite_code = 'Invite code is required'
+      } else if (form.invite_code.length < 8) {
+        newErrors.invite_code = 'Please enter a valid invite code'
       }
 
       if (!form.acceptTerms) {
