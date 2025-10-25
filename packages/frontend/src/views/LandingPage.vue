@@ -571,12 +571,20 @@ export default {
       // Start periodic updates every 30 seconds
       const marketInterval = setInterval(fetchMarketData, 30000)
 
+      // Auto-refresh WIN chart every 5 seconds for real-time updates
+      const chartRefreshInterval = setInterval(() => {
+        if (selectedSymbol.value === 'WIN') {
+          initTradingViewChart()
+        }
+      }, 5000) // Refresh every 5 seconds
+
       // Initialize chart
       initTradingViewChart()
 
       // Cleanup
       onUnmounted(() => {
         clearInterval(marketInterval)
+        clearInterval(chartRefreshInterval)
         if (winChartWidget.value && winChartWidget.value.cleanup) {
           winChartWidget.value.cleanup()
         }
