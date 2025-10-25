@@ -42,14 +42,14 @@ class WinPriceSimulator {
     this.isRunning = true;
     logger.info('Starting WIN Price Simulator');
 
-    // Generate price updates every 2 seconds for faster real-time movement
+    // Generate price updates every 1 second for fastest real-time movement
     this.intervals.priceUpdate = setInterval(async () => {
       try {
         await this.generatePriceUpdate();
       } catch (error) {
         logger.error('Error in price update:', error);
       }
-    }, 2000); // 2 seconds (5x faster)
+    }, 1000); // 1 second
 
     // Aggregate candles every minute
     this.intervals.candleAggregation = setInterval(async () => {
@@ -100,8 +100,8 @@ class WinPriceSimulator {
       const volatility = parseFloat(config.volatility); // Standard deviation
       const trendStrength = parseFloat(config.trend_strength); // Drift coefficient
 
-      // Time step (2 seconds as fraction of year)
-      const dt = 2 / (365 * 24 * 60 * 60);
+      // Time step (1 second as fraction of year)
+      const dt = 1 / (365 * 24 * 60 * 60);
 
       // Geometric Brownian Motion:
       // dS = μ * S * dt + σ * S * dW
