@@ -118,17 +118,22 @@ const authService = {
   },
 
   // Get OAuth authorization URL
-  getOAuthURL: async (provider) => {
-    const response = await apiHelpers.get(`/api/auth/oauth/${provider}`)
+  getOAuthURL: async (provider, invite_code) => {
+    const url = invite_code
+      ? `/api/auth/oauth/${provider}?invite_code=${encodeURIComponent(invite_code)}`
+      : `/api/auth/oauth/${provider}`;
+    const response = await apiHelpers.get(url)
     return response
   },
 
   // OAuth callback
   handleOAuthCallback: async (provider, code, state) => {
-    return await apiHelpers.post(`/api/auth/oauth/${provider}/callback`, {
+    const payload = {
       code,
       state
-    })
+    }
+
+    return await apiHelpers.post(`/api/auth/oauth/${provider}/callback`, payload)
   },
 
   // Check if email exists

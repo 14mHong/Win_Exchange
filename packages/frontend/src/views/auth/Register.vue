@@ -456,12 +456,23 @@ export default {
 
     const handleOAuthRegister = async (provider) => {
       try {
+        // Validate invite code before OAuth redirect
+        if (!form.invite_code) {
+          errors.invite_code = 'Please enter your invite code before continuing with Google'
+          return
+        }
+
+        if (form.invite_code.length < 8) {
+          errors.invite_code = 'Please enter a valid invite code'
+          return
+        }
+
         isLoading.value = true
-        const response = await authService.getOAuthURL(provider)
-        
+        // Pass invite_code to backend - it will be encoded in the state parameter
+        const response = await authService.getOAuthURL(provider, form.invite_code)
+
         if (response.success && response.authUrl) {
-          // Store the state for later verification
-          localStorage.setItem(`oauth_state_${provider}`, response.state)
+          // No need to store invite_code in localStorage anymore - it's in the state parameter
           window.location.href = response.authUrl
         } else {
           errors.general = response.error || 'Failed to get OAuth URL'

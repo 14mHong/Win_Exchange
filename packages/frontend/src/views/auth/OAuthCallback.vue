@@ -88,16 +88,11 @@ export default {
           throw new Error('State parameter not received')
         }
 
-        // Verify state matches what we stored
-        const storedState = localStorage.getItem(`oauth_state_${provider.value}`)
-        if (storedState !== state) {
-          throw new Error('Invalid state parameter')
-        }
-
-        // Clean up stored state
-        localStorage.removeItem(`oauth_state_${provider.value}`)
+        // Note: State verification is now handled by backend (nonce in Redis)
+        // The invite_code is encoded in the state parameter and will be validated by backend
 
         // Exchange code for token
+        // No need to pass invite_code separately - it's encoded in state parameter
         const response = await authService.handleOAuthCallback(provider.value, code, state)
 
         if (response.success) {

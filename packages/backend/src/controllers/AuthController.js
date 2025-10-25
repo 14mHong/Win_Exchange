@@ -497,6 +497,7 @@ class AuthController {
   static async initiateOAuth(req, res) {
     try {
       const { provider } = req.params;
+      const { invite_code } = req.query; // Get invite code from query params
 
       if (provider !== 'google') {
         return res.status(400).json({
@@ -505,12 +506,20 @@ class AuthController {
         });
       }
 
-      // Generate state parameter for security
-      const state = require('crypto').randomBytes(32).toString('hex');
+      // Generate random nonce for security
+      const nonce = require('crypto').randomBytes(16).toString('hex');
 
-      // Store state in session or cache (for production, use Redis)
-      req.session = req.session || {};
-      req.session.oauthState = state;
+      // Create state object with nonce and invite_code
+      const stateData = {
+        nonce,
+        invite_code: invite_code || null
+      };
+
+      // Encode state as base64
+      const state = Buffer.from(JSON.stringify(stateData)).toString('base64');
+
+      // Store nonce in Redis for verification (expires in 10 minutes)
+      await redis.setex(`oauth_nonce:${nonce}`, 600, JSON.stringify({ created: Date.now() }));
 
       // Backend OAuth callback URL (where Google redirects after auth)
       const backendUrl = process.env.BACKEND_URL || 'https://win-exchange-bdmv.onrender.com';
@@ -553,11 +562,35 @@ class AuthController {
         });
       }
 
-      // Verify state parameter (in production, check against stored state)
+      // Verify state parameter
       if (!state) {
         return res.status(400).json({
           success: false,
           error: 'State parameter is required'
+        });
+      }
+
+      // Decode state to get nonce and invite_code
+      let stateData;
+      let invite_code = null;
+      try {
+        const stateJson = Buffer.from(state, 'base64').toString('utf-8');
+        stateData = JSON.parse(stateJson);
+        invite_code = stateData.invite_code;
+
+        // Verify nonce exists in Redis
+        const nonceData = await redis.get(`oauth_nonce:${stateData.nonce}`);
+        if (!nonceData) {
+          throw new Error('Invalid or expired state parameter');
+        }
+
+        // Delete nonce to prevent reuse
+        await redis.del(`oauth_nonce:${stateData.nonce}`);
+      } catch (decodeError) {
+        logger.error('State decode error:', decodeError);
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid state parameter'
         });
       }
 
@@ -642,6 +675,27 @@ class AuthController {
       }
 
       if (!user) {
+        // Validate invite code for new users
+        if (!invite_code) {
+          const frontendUrl = process.env.FRONTEND_URL || 'https://win-exchange-frontend.onrender.com';
+          const errorUrl = `${frontendUrl}/register?error=${encodeURIComponent('An invite code is required to register')}`;
+          return req.method === 'GET' ? res.redirect(errorUrl) : res.status(400).json({
+            success: false,
+            error: 'An invite code is required to register'
+          });
+        }
+
+        const InviteCode = require('../models/InviteCode');
+        const isValidCode = await InviteCode.isValid(invite_code);
+        if (!isValidCode) {
+          const frontendUrl = process.env.FRONTEND_URL || 'https://win-exchange-frontend.onrender.com';
+          const errorUrl = `${frontendUrl}/register?error=${encodeURIComponent('Invalid or expired invite code')}`;
+          return req.method === 'GET' ? res.redirect(errorUrl) : res.status(400).json({
+            success: false,
+            error: 'Invalid or expired invite code'
+          });
+        }
+
         user = await User.createOAuthUser({
           email: userProfile.email,
           google_id: userProfile.id,
@@ -651,6 +705,9 @@ class AuthController {
           email_verified: true,
           provider: 'google'
         });
+
+        // Mark invite code as used
+        await InviteCode.validateAndUse(invite_code, user.id);
       }
 
       // Generate JWT token
