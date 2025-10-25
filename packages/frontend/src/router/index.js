@@ -20,6 +20,7 @@ const OAuthSuccess = () => import('@/views/auth/OAuthSuccess.vue')
 
 // Public pages
 const LandingPage = () => import('@/views/LandingPage.vue')
+const GetInviteCode = () => import('@/views/GetInviteCode.vue')
 
 // App pages
 const Dashboard = () => import('@/views/Dashboard.vue')
@@ -48,6 +49,16 @@ const routes = [
     component: LandingPage,
     meta: {
       title: 'Win Exchange - Professional Cryptocurrency Trading'
+    }
+  },
+
+  // Get Invite Code page
+  {
+    path: '/get-invite-code',
+    name: 'GetInviteCode',
+    component: GetInviteCode,
+    meta: {
+      title: 'Get Invite Code - Win Exchange'
     }
   },
 

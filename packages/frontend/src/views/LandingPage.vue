@@ -14,6 +14,12 @@
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <router-link
+              to="/get-invite-code"
+              class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl"
+            >
+              🎟️ Get Invite Code
+            </router-link>
+            <router-link
               to="/register"
               class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
@@ -26,6 +32,9 @@
               Sign In
             </router-link>
           </div>
+          <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+            Need an invite code to register? Purchase one with ETH!
+          </p>
         </div>
       </div>
     </section>

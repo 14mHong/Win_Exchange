@@ -21,6 +21,7 @@ const swapRoutes = require('./routes/swap');
 const adminRoutes = require('./routes/admin');
 const winTokenRoutes = require('./routes/api/winToken');
 const adminWinTokenRoutes = require('./routes/admin/winToken');
+const inviteCodeRoutes = require('./routes/inviteCodes');
 
 // Create Express app
 const createApp = () => {
@@ -62,6 +63,7 @@ const createApp = () => {
   app.use('/api/admin', adminRoutes);
   app.use('/api/win-token', winTokenRoutes);
   app.use('/api/admin/win-token', adminWinTokenRoutes);
+  app.use('/api/invite-codes', inviteCodeRoutes);
 
   // Error handling middleware
   app.use((err, req, res, next) => {
