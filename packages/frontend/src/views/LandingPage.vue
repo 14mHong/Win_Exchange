@@ -541,11 +541,45 @@ export default {
       }
       window.addEventListener('resize', resizeHandler)
 
-      // Store chart reference with cleanup
-      if (winChartWidget.value && winChartWidget.value.remove) {
-        winChartWidget.value.remove()
+      // Store chart and series reference with cleanup
+      if (winChartWidget.value && winChartWidget.value.chart) {
+        winChartWidget.value.chart.remove()
       }
-      winChartWidget.value = { chart, cleanup: () => window.removeEventListener('resize', resizeHandler) }
+      winChartWidget.value = {
+        chart,
+        series: candlestickSeries,
+        cleanup: () => window.removeEventListener('resize', resizeHandler)
+      }
+    }
+
+    // Update WIN chart data without recreating the chart
+    const updateWinChartData = async () => {
+      try {
+        if (selectedSymbol.value !== 'WIN' || !winChartWidget.value?.series) {
+          return
+        }
+
+        const range = timeRanges.find(r => r.value === selectedTimeRange.value) || timeRanges[0]
+        const chartResponse = await winTokenService.getChartData(range.timeframe, range.limit)
+
+        if (!chartResponse.success) {
+          return
+        }
+
+        // Format and update data
+        const formattedData = chartResponse.data.candles.map(candle => ({
+          time: Math.floor(new Date(candle.timestamp).getTime() / 1000),
+          open: parseFloat(candle.open),
+          high: parseFloat(candle.high),
+          low: parseFloat(candle.low),
+          close: parseFloat(candle.close)
+        })).sort((a, b) => a.time - b.time)
+
+        // Update the series data smoothly
+        winChartWidget.value.series.setData(formattedData)
+      } catch (error) {
+        console.error('Error updating WIN chart data:', error)
+      }
     }
 
     const viewTokenChart = (symbol) => {
@@ -571,11 +605,9 @@ export default {
       // Start periodic updates every 30 seconds
       const marketInterval = setInterval(fetchMarketData, 30000)
 
-      // Auto-refresh WIN chart every 5 seconds for real-time updates
+      // Auto-refresh WIN chart data every 5 seconds for real-time updates
       const chartRefreshInterval = setInterval(() => {
-        if (selectedSymbol.value === 'WIN') {
-          initTradingViewChart()
-        }
+        updateWinChartData()
       }, 5000) // Refresh every 5 seconds
 
       // Initialize chart
