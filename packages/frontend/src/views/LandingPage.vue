@@ -605,10 +605,10 @@ export default {
       // Start periodic updates every 30 seconds
       const marketInterval = setInterval(fetchMarketData, 30000)
 
-      // Auto-refresh WIN chart data every 5 seconds for real-time updates
+      // Auto-refresh WIN chart data every 3 seconds for real-time updates
       const chartRefreshInterval = setInterval(() => {
         updateWinChartData()
-      }, 5000) // Refresh every 5 seconds
+      }, 3000) // Refresh every 3 seconds
 
       // Initialize chart
       initTradingViewChart()
