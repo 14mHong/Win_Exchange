@@ -51,14 +51,14 @@ class WinPriceSimulator {
       }
     }, 1000); // 1 second
 
-    // Aggregate candles every minute
+    // Aggregate candles every 5 seconds for faster chart updates
     this.intervals.candleAggregation = setInterval(async () => {
       try {
         await this.aggregateCandles();
       } catch (error) {
         logger.error('Error aggregating candles:', error);
       }
-    }, 60000); // 1 minute
+    }, 5000); // 5 seconds
 
     // Generate simulated trades every 5-30 seconds
     this.generateRandomTrades();
