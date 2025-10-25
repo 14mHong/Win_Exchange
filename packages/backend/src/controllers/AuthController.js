@@ -16,7 +16,11 @@ class AuthController {
         first_name: Joi.string().max(100).required(),
         last_name: Joi.string().max(100).required(),
         password: Joi.string().min(8).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/).required(),
-        confirmPassword: Joi.string().valid(Joi.ref('password')).required()
+        confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
+        invite_code: Joi.string().required().messages({
+          'any.required': 'An invite code is required to register',
+          'string.empty': 'Please enter your invite code'
+        })
       });
 
       const { error, value } = schema.validate(req.body);
@@ -27,8 +31,8 @@ class AuthController {
         });
       }
 
-      const { email, phone, first_name, last_name, password } = value;
-      const result = await AuthService.register({ email, phone, first_name, last_name, password });
+      const { email, phone, first_name, last_name, password, invite_code } = value;
+      const result = await AuthService.register({ email, phone, first_name, last_name, password, invite_code });
 
       // Log registration attempt (user not created yet, only pending)
       logger.info('Registration initiated', {

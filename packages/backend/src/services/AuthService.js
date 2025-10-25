@@ -2,6 +2,7 @@ const User = require('../models/User');
 const PendingUser = require('../models/PendingUser');
 const Session = require('../models/Session');
 const VerificationCode = require('../models/VerificationCode');
+const InviteCode = require('../models/InviteCode');
 const EmailService = require('./EmailService');
 const TwilioService = require('./TwilioService');
 const redis = require('../config/redis');
@@ -10,8 +11,18 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 class AuthService {
-  static async register({ email, phone, first_name, last_name, password }) {
+  static async register({ email, phone, first_name, last_name, password, invite_code }) {
     try {
+      // Validate invite code first
+      if (!invite_code) {
+        throw new Error('An invite code is required to register');
+      }
+
+      const isValidCode = await InviteCode.isValid(invite_code);
+      if (!isValidCode) {
+        throw new Error('Invalid or expired invite code');
+      }
+
       // Check if user already exists
       const existingUser = await User.findByEmail(email);
       if (existingUser) {
@@ -57,8 +68,8 @@ class AuthService {
         };
       }
 
-      // Create pending user
-      const pendingUser = await PendingUser.create({ email, phone, first_name, last_name, password });
+      // Create pending user with invite code
+      const pendingUser = await PendingUser.create({ email, phone, first_name, last_name, password, invite_code });
 
       // Send verification email with OTP
       try {
