@@ -490,10 +490,11 @@ class CryptoWalletService {
       // Handle Bitcoin and Bitcoin-like coins
       if (['BTC', 'LTC'].includes(currency)) {
         const seed = bip39.mnemonicToSeedSync(this.masterSeed);
-        const root = bip32.BIP32Factory(ecc).fromSeed(seed);
-        const child = root.derivePath(derivationPath);
 
+        // IMPORTANT: Pass network parameter to fromSeed for correct WIF encoding
         const network = this.networks[currency];
+        const root = bip32.BIP32Factory(ecc).fromSeed(seed, network);
+        const child = root.derivePath(derivationPath);
         const { address } = bitcoin.payments.p2pkh({
           pubkey: child.publicKey,
           network
