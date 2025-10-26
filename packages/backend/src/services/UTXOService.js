@@ -14,15 +14,12 @@ const axios = require('axios');
  */
 class UTXOService {
   constructor() {
-    // Blockchain API configuration (Blockchain.com - Free, no API key required)
+    // Blockchain API configuration (Free, no API key required)
     this.blockchainAPI = {
       BTC: 'https://blockchain.info',
       BTC_TEST: 'https://testnet.blockchain.info',
-      LTC: 'https://api.blockcypher.com/v1/ltc/main' // Keep LTC on BlockCypher for now
+      LTC: 'https://litecoinspace.org' // Litecoinspace.org - Free API like Mempool.space
     };
-
-    // API token (only for LTC via BlockCypher)
-    this.apiToken = process.env.BLOCKCYPHER_TOKEN;
 
     // Minimum confirmations required
     this.minConfirmations = {
@@ -30,7 +27,7 @@ class UTXOService {
       LTC: 6
     };
 
-    logger.info('UTXOService initialized with Blockchain.com API for BTC');
+    logger.info('UTXOService initialized with free APIs: Blockchain.com for BTC, Litecoinspace for LTC');
   }
 
   /**
@@ -326,24 +323,21 @@ class UTXOService {
           txHash: response.data, // Blockchain.com returns just the tx hash as string
           data: response.data
         };
-      } else {
-        // Use BlockCypher for LTC
-        const url = this.apiToken
-          ? `${apiUrl}/txs/push?token=${this.apiToken}`
-          : `${apiUrl}/txs/push`;
-
-        const response = await axios.post(url, {
-          tx: txHex
+      } else if (currency === 'LTC') {
+        // Use Litecoinspace.org API for Litecoin
+        const url = `${apiUrl}/api/tx`;
+        const response = await axios.post(url, txHex, {
+          headers: { 'Content-Type': 'text/plain' }
         });
 
-        logger.info('Transaction broadcasted via BlockCypher', {
-          txHash: response.data.tx.hash,
+        logger.info('Transaction broadcasted via Litecoinspace', {
+          txHash: response.data,
           currency
         });
 
         return {
           success: true,
-          txHash: response.data.tx.hash,
+          txHash: response.data, // Returns tx hash as string
           data: response.data
         };
       }
@@ -420,37 +414,42 @@ class UTXOService {
           utxoCount: addressData.unspent_outputs ? addressData.unspent_outputs.length : 0
         };
 
-      } else {
-        // Use BlockCypher for LTC (keep existing code)
-        const url = this.apiToken
-          ? `${apiUrl}/addrs/${address}?token=${this.apiToken}&unspentOnly=true`
-          : `${apiUrl}/addrs/${address}?unspentOnly=true`;
-
+      } else if (currency === 'LTC') {
+        // Use Litecoinspace.org API for Litecoin (same format as Mempool.space)
+        const url = `${apiUrl}/api/address/${address}/utxo`;
         response = await axios.get(url);
-        addressData = response.data;
+        const utxos = response.data;
 
-        // Get UTXOs for this address
-        if (addressData.txrefs && addressData.txrefs.length > 0) {
-          for (const txref of addressData.txrefs) {
+        // Get current block height to calculate confirmations
+        const blockHeightResponse = await axios.get(`${apiUrl}/api/blocks/tip/height`);
+        const currentBlockHeight = blockHeightResponse.data;
+
+        // Process UTXOs
+        if (utxos && utxos.length > 0) {
+          for (const utxo of utxos) {
+            const confirmations = utxo.status?.confirmed && utxo.status?.block_height
+              ? currentBlockHeight - utxo.status.block_height + 1
+              : 0;
+
             // Check if UTXO already exists
             const existing = await query(
               'SELECT id FROM utxos WHERE tx_hash = $1 AND vout = $2 AND currency = $3',
-              [txref.tx_hash, txref.tx_output_n, currency]
+              [utxo.txid, utxo.vout, currency]
             );
 
             if (existing.rows.length === 0) {
               // Add new UTXO
               await this.addUTXO({
-                txHash: txref.tx_hash,
-                vout: txref.tx_output_n,
+                txHash: utxo.txid,
+                vout: utxo.vout,
                 userId,
                 address,
                 derivationPath,
                 currency,
-                amount: txref.value / 100000000, // Convert satoshi to BTC
-                blockHeight: txref.block_height,
-                confirmations: txref.confirmations,
-                scriptPubKey: txref.script
+                amount: utxo.value / 100000000, // Convert litoshi to LTC
+                blockHeight: utxo.status?.block_height || null,
+                confirmations,
+                scriptPubKey: null // Not provided by this API
               });
             } else {
               // Update confirmations
@@ -458,17 +457,19 @@ class UTXOService {
                 UPDATE utxos
                 SET
                   confirmations = $1,
+                  block_height = $2,
                   status = CASE
-                    WHEN $1 >= $2 THEN 'confirmed'
+                    WHEN $1 >= $3 THEN 'confirmed'
                     ELSE 'unconfirmed'
                   END,
                   updated_at = CURRENT_TIMESTAMP
-                WHERE tx_hash = $3 AND vout = $4 AND currency = $5
+                WHERE tx_hash = $4 AND vout = $5 AND currency = $6
               `, [
-                txref.confirmations,
+                confirmations,
+                utxo.status?.block_height || null,
                 this.minConfirmations[currency],
-                txref.tx_hash,
-                txref.tx_output_n,
+                utxo.txid,
+                utxo.vout,
                 currency
               ]);
             }
@@ -478,9 +479,7 @@ class UTXOService {
         return {
           success: true,
           address,
-          balance: addressData.balance,
-          unconfirmedBalance: addressData.unconfirmed_balance,
-          utxoCount: addressData.n_tx
+          utxoCount: utxos ? utxos.length : 0
         };
       }
     } catch (error) {
@@ -504,19 +503,15 @@ class UTXOService {
           medium: response.data.halfHourFee,
           low: response.data.hourFee
         };
-      } else {
-        // Use BlockCypher for LTC
-        const apiUrl = this.blockchainAPI[currency];
-        const url = this.apiToken
-          ? `${apiUrl}?token=${this.apiToken}`
-          : apiUrl;
-
+      } else if (currency === 'LTC') {
+        // Use Litecoinspace.org for LTC fees (same API as Mempool.space)
+        const url = 'https://litecoinspace.org/api/v1/fees/recommended';
         const response = await axios.get(url);
 
         return {
-          high: response.data.high_fee_per_kb / 1024, // Convert to per byte
-          medium: response.data.medium_fee_per_kb / 1024,
-          low: response.data.low_fee_per_kb / 1024
+          high: response.data.fastestFee,
+          medium: response.data.halfHourFee,
+          low: response.data.hourFee
         };
       }
     } catch (error) {
