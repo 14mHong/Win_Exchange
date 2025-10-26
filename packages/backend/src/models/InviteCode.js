@@ -127,6 +127,95 @@ class InviteCode {
   }
 
   /**
+   * Reserve an invite code slot (increment usage immediately during registration)
+   * This prevents race conditions where multiple users register with same code
+   * Uses row-level locking like validateAndUse
+   */
+  static async reserve(code) {
+    const client = await require('../config/database').getClient();
+
+    try {
+      await client.query('BEGIN');
+
+      // Lock the row and check if code exists and is valid
+      const codeResult = await client.query(`
+        SELECT * FROM invite_codes
+        WHERE code = $1
+        FOR UPDATE
+      `, [code]);
+
+      if (codeResult.rows.length === 0) {
+        await client.query('ROLLBACK');
+        throw new Error('Invalid invite code');
+      }
+
+      const inviteCode = codeResult.rows[0];
+
+      // Check if active
+      if (!inviteCode.is_active) {
+        await client.query('ROLLBACK');
+        throw new Error('This invite code is no longer active');
+      }
+
+      // Check expiration
+      if (inviteCode.expires_at && new Date(inviteCode.expires_at) < new Date()) {
+        await client.query('ROLLBACK');
+        throw new Error('This invite code has expired');
+      }
+
+      // Check usage limit (CRITICAL: this check happens AFTER row lock)
+      if (inviteCode.current_uses >= inviteCode.max_uses) {
+        await client.query('ROLLBACK');
+        throw new Error('This invite code has already been used');
+      }
+
+      // Reserve a slot by incrementing usage
+      const updateResult = await client.query(`
+        UPDATE invite_codes
+        SET
+          current_uses = current_uses + 1,
+          is_active = CASE WHEN current_uses + 1 >= max_uses THEN FALSE ELSE is_active END
+        WHERE code = $1
+        RETURNING *
+      `, [code]);
+
+      await client.query('COMMIT');
+
+      logger.info('Invite code reserved', { code, newUsageCount: updateResult.rows[0].current_uses });
+      return { success: true, inviteCode: updateResult.rows[0] };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      logger.error('Error reserving invite code:', error);
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Mark a reserved code as actually used (set used_by and used_at)
+   * Called after user completes verification
+   */
+  static async markAsUsed(code, userId) {
+    try {
+      const result = await query(`
+        UPDATE invite_codes
+        SET
+          used_by = CASE WHEN used_by IS NULL THEN $1 ELSE used_by END,
+          used_at = CASE WHEN used_at IS NULL THEN CURRENT_TIMESTAMP ELSE used_at END
+        WHERE code = $2
+        RETURNING *
+      `, [userId, code]);
+
+      logger.info('Invite code marked as used', { code, userId });
+      return result.rows[0];
+    } catch (error) {
+      logger.error('Error marking invite code as used:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get code details
    */
   static async getByCode(code) {

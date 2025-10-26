@@ -13,15 +13,13 @@ const crypto = require('crypto');
 class AuthService {
   static async register({ email, phone, first_name, last_name, password, invite_code }) {
     try {
-      // Validate invite code first
+      // Reserve invite code first (this locks it atomically to prevent race conditions)
       if (!invite_code) {
         throw new Error('An invite code is required to register');
       }
 
-      const isValidCode = await InviteCode.isValid(invite_code);
-      if (!isValidCode) {
-        throw new Error('Invalid or expired invite code');
-      }
+      // Reserve the code immediately - this increments usage and locks the row
+      await InviteCode.reserve(invite_code);
 
       // Check if user already exists
       const existingUser = await User.findByEmail(email);

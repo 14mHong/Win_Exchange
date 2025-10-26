@@ -15,6 +15,7 @@ class PendingUser {
     this.verification_expires_at = data.verification_expires_at;
     this.created_at = data.created_at;
     this.attempts = data.attempts;
+    this.invite_code = data.invite_code;
   }
 
   static async create({ email, phone, first_name, last_name, password, invite_code }) {
@@ -105,9 +106,9 @@ class PendingUser {
       email_verified: true // Email is verified since they completed OTP
     });
 
-    // Mark invite code as used
+    // Mark invite code as used (code was already reserved during registration)
     if (this.invite_code) {
-      await InviteCode.validateAndUse(this.invite_code, user.id);
+      await InviteCode.markAsUsed(this.invite_code, user.id);
     }
 
     // Clean up pending user
