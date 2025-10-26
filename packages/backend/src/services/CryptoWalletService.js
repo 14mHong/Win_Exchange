@@ -166,12 +166,16 @@ class CryptoWalletService {
   _deriveBitcoinWallet(path, currency, userId, testnet = false) {
     try {
       const seed = bip39.mnemonicToSeedSync(this.masterSeed);
-      const root = bip32.BIP32Factory(ecc).fromSeed(seed);
-      const child = root.derivePath(path);
 
       const network = testnet
         ? this.networks[`${currency}_TESTNET`]
         : this.networks[currency];
+
+      // IMPORTANT: Pass network to fromSeed so WIF encoding uses correct prefix
+      // Bitcoin WIF: starts with K, L, or 5 (prefix 0x80)
+      // Litecoin WIF: starts with T or 6 (prefix 0xb0)
+      const root = bip32.BIP32Factory(ecc).fromSeed(seed, network);
+      const child = root.derivePath(path);
 
       // P2WPKH address (Native SegWit - bech32 format)
       // BTC: bc1..., LTC: ltc1...
