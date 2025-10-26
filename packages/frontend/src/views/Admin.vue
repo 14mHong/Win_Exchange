@@ -42,6 +42,88 @@
       </div>
     </div>
 
+    <!-- Invite Codes Section -->
+    <div class="content-section mb-6">
+      <div class="section-header">
+        <h2 class="section-title">🎫 Invite Codes</h2>
+        <button @click="showGenerateModal = true" class="generate-btn">
+          + Generate Codes
+        </button>
+      </div>
+
+      <div class="invite-stats-grid">
+        <div class="invite-stat-card">
+          <div class="invite-stat-label">Total Codes</div>
+          <div class="invite-stat-value">{{ inviteStats.total_codes || 0 }}</div>
+        </div>
+        <div class="invite-stat-card">
+          <div class="invite-stat-label">Active Codes</div>
+          <div class="invite-stat-value text-green-400">{{ inviteStats.active_codes || 0 }}</div>
+        </div>
+        <div class="invite-stat-card">
+          <div class="invite-stat-label">Used Codes</div>
+          <div class="invite-stat-value text-blue-400">{{ inviteStats.used_codes || 0 }}</div>
+        </div>
+        <div class="invite-stat-card">
+          <div class="invite-stat-label">Expired Codes</div>
+          <div class="invite-stat-value text-red-400">{{ inviteStats.expired_codes || 0 }}</div>
+        </div>
+      </div>
+
+      <div class="table-container mt-4">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Status</th>
+              <th>Uses</th>
+              <th>Created By</th>
+              <th>Created At</th>
+              <th>Used By</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="code in inviteCodes" :key="code.id">
+              <td>
+                <div class="code-value">{{ code.code }}</div>
+              </td>
+              <td>
+                <span class="status-badge" :class="code.is_active ? 'verified' : 'inactive'">
+                  {{ code.is_active ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>{{ code.current_uses }} / {{ code.max_uses }}</td>
+              <td>{{ code.created_by_email || 'System' }}</td>
+              <td>{{ formatDate(code.created_at) }}</td>
+              <td>{{ code.used_by_email || '-' }}</td>
+              <td class="text-sm text-gray-400">{{ code.notes || '-' }}</td>
+              <td>
+                <button
+                  v-if="code.is_active"
+                  @click="deactivateCode(code.code)"
+                  class="action-btn danger"
+                  title="Deactivate"
+                >
+                  ❌
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div v-if="loadingCodes" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading invite codes...</p>
+        </div>
+
+        <div v-if="!loadingCodes && inviteCodes.length === 0" class="empty-state">
+          <p>No invite codes generated yet</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Users Table -->
     <div class="content-section">
       <div class="section-header">
@@ -207,6 +289,86 @@
       </div>
     </div>
 
+    <!-- Generate Invite Codes Modal -->
+    <div v-if="showGenerateModal" class="modal-overlay" @click="closeGenerateModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">Generate Invite Codes</h3>
+          <button @click="closeGenerateModal" class="modal-close">×</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="generateCodes">
+            <div class="form-group">
+              <label>Number of Codes</label>
+              <input
+                v-model.number="generateForm.count"
+                type="number"
+                min="1"
+                max="100"
+                class="form-input"
+                required
+              />
+              <p class="form-hint">Generate 1-100 codes at once</p>
+            </div>
+
+            <div class="form-group">
+              <label>Notes (Optional)</label>
+              <textarea
+                v-model="generateForm.notes"
+                class="form-input"
+                rows="3"
+                placeholder="e.g., Testing codes for QA team"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Max Uses per Code</label>
+              <input
+                v-model.number="generateForm.maxUses"
+                type="number"
+                min="1"
+                max="1000"
+                class="form-input"
+                required
+              />
+              <p class="form-hint">How many times each code can be used</p>
+            </div>
+
+            <div v-if="generatedCodes.length > 0" class="generated-codes-box">
+              <div class="generated-header">
+                <h4>✅ Generated {{ generatedCodes.length }} Codes</h4>
+                <button type="button" @click="copyAllCodes" class="copy-all-btn">
+                  📋 Copy All
+                </button>
+              </div>
+              <div class="codes-list">
+                <div v-for="code in generatedCodes" :key="code.code" class="generated-code-item">
+                  {{ code.code }}
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button
+                type="submit"
+                :disabled="loadingGenerate"
+                class="modal-btn danger"
+              >
+                <span v-if="!loadingGenerate">Generate Codes</span>
+                <span v-else class="flex items-center justify-center gap-2">
+                  <div class="spinner-small"></div>
+                  Generating...
+                </span>
+              </button>
+              <button type="button" @click="closeGenerateModal" class="modal-btn secondary">
+                Close
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- User Details Modal -->
     <div v-if="showDetailsModal" class="modal-overlay" @click="closeDetailsModal">
       <div class="modal-content large-modal" @click.stop>
@@ -275,15 +437,26 @@ const notificationStore = useNotificationStore();
 // State
 const loading = ref(false);
 const loadingKeys = ref(false);
+const loadingCodes = ref(false);
+const loadingGenerate = ref(false);
 const users = ref([]);
 const stats = ref({});
 const searchQuery = ref('');
 const showKeyModal = ref(false);
 const showDetailsModal = ref(false);
+const showGenerateModal = ref(false);
 const selectedUser = ref(null);
 const userDetails = ref(null);
 const privateKeys = ref([]);
 const showPrivateKey = ref(false);
+const inviteCodes = ref([]);
+const inviteStats = ref({});
+const generatedCodes = ref([]);
+const generateForm = ref({
+  count: 10,
+  notes: '',
+  maxUses: 1
+});
 
 // Computed
 const filteredUsers = computed(() => {
@@ -409,6 +582,77 @@ const formatDate = (date) => {
   return new Date(date).toLocaleDateString();
 };
 
+// Invite Code Methods
+const fetchInviteCodes = async () => {
+  loadingCodes.value = true;
+  try {
+    const response = await apiHelpers.get('/api/admin/invite-codes?limit=50');
+    if (response.success) {
+      inviteCodes.value = response.codes;
+      inviteStats.value = response.stats;
+    }
+  } catch (err) {
+    console.error('Failed to fetch invite codes:', err);
+    notificationStore.error('Error', err.message || 'Failed to load invite codes');
+  } finally {
+    loadingCodes.value = false;
+  }
+};
+
+const generateCodes = async () => {
+  loadingGenerate.value = true;
+  try {
+    const response = await apiHelpers.post('/api/admin/invite-codes/generate', generateForm.value);
+    if (response.success) {
+      generatedCodes.value = response.codes;
+      notificationStore.success('Success', response.message);
+      await fetchInviteCodes(); // Refresh the list
+    }
+  } catch (err) {
+    console.error('Failed to generate codes:', err);
+    notificationStore.error('Error', err.message || 'Failed to generate invite codes');
+  } finally {
+    loadingGenerate.value = false;
+  }
+};
+
+const deactivateCode = async (code) => {
+  if (!confirm(`Are you sure you want to deactivate code: ${code}?`)) {
+    return;
+  }
+
+  try {
+    const response = await apiHelpers.post(`/api/admin/invite-codes/${code}/deactivate`);
+    if (response.success) {
+      notificationStore.success('Success', 'Code deactivated successfully');
+      await fetchInviteCodes(); // Refresh the list
+    }
+  } catch (err) {
+    console.error('Failed to deactivate code:', err);
+    notificationStore.error('Error', err.message || 'Failed to deactivate code');
+  }
+};
+
+const copyAllCodes = async () => {
+  const codesList = generatedCodes.value.map(c => c.code).join('\n');
+  try {
+    await navigator.clipboard.writeText(codesList);
+    notificationStore.success('Copied', 'All codes copied to clipboard');
+  } catch (err) {
+    notificationStore.error('Error', 'Failed to copy to clipboard');
+  }
+};
+
+const closeGenerateModal = () => {
+  showGenerateModal.value = false;
+  generatedCodes.value = [];
+  generateForm.value = {
+    count: 10,
+    notes: '',
+    maxUses: 1
+  };
+};
+
 // Check if user is admin
 const checkAdminAccess = () => {
   // This should be checked on the backend, but we can also check on frontend
@@ -423,6 +667,7 @@ onMounted(() => {
   checkAdminAccess();
   fetchStats();
   fetchUsers();
+  fetchInviteCodes();
 });
 </script>
 
@@ -942,6 +1187,150 @@ onMounted(() => {
   font-size: 0.75rem;
 }
 
+/* Invite Code Styles */
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.generate-btn {
+  padding: 0.75rem 1.5rem;
+  background: #48bb78;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.generate-btn:hover {
+  background: #38a169;
+}
+
+.invite-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.invite-stat-card {
+  background: #0f1117;
+  border: 1px solid #2d3748;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.invite-stat-label {
+  font-size: 0.875rem;
+  color: #a0aec0;
+  margin-bottom: 0.5rem;
+}
+
+.invite-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.code-value {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: #48bb78;
+  background: rgba(72, 187, 120, 0.1);
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  color: white;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  width: 100%;
+  background: #0f1117;
+  border: 1px solid #2d3748;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #4299e1;
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: #718096;
+  margin-top: 0.25rem;
+}
+
+.generated-codes-box {
+  background: rgba(72, 187, 120, 0.1);
+  border: 2px solid rgba(72, 187, 120, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.generated-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.generated-header h4 {
+  color: #48bb78;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.copy-all-btn {
+  padding: 0.5rem 1rem;
+  background: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.copy-all-btn:hover {
+  background: #3182ce;
+}
+
+.codes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.generated-code-item {
+  background: #0f1117;
+  border: 1px solid #2d3748;
+  border-radius: 4px;
+  padding: 0.5rem;
+  font-family: 'Courier New', monospace;
+  color: #48bb78;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .admin-page {
     padding: 1rem;
@@ -949,6 +1338,10 @@ onMounted(() => {
 
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .invite-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .section-header {
@@ -967,6 +1360,10 @@ onMounted(() => {
 
   .modal-content {
     max-width: 100%;
+  }
+
+  .codes-list {
+    grid-template-columns: 1fr;
   }
 }
 </style>
