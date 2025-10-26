@@ -199,6 +199,13 @@
                   >
                     🔑
                   </button>
+                  <button
+                    @click="confirmDeleteUser(user)"
+                    class="action-btn delete"
+                    title="Delete User"
+                  >
+                    🗑️
+                  </button>
                 </div>
               </td>
             </tr>
@@ -283,6 +290,67 @@
             </button>
             <button @click="closeKeyModal" class="modal-btn secondary">
               Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete User Confirmation Modal -->
+    <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
+      <div class="modal-content danger-modal" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">⚠️ Delete User</h3>
+          <button @click="closeDeleteModal" class="modal-close">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="warning-box">
+            <p class="warning-title">CRITICAL WARNING</p>
+            <p class="warning-text">
+              You are about to permanently delete user:
+              <strong>{{ userToDelete?.email }}</strong>
+            </p>
+            <p class="warning-text">
+              This will permanently delete ALL associated data:
+            </p>
+            <ul class="warning-list">
+              <li>User account and profile</li>
+              <li>All wallet balances</li>
+              <li>All transaction history</li>
+              <li>All deposit addresses</li>
+              <li>All orders and trades</li>
+              <li>All UTXOs</li>
+              <li>All sessions and API keys</li>
+            </ul>
+            <p class="warning-text text-red-400 font-bold mt-4">
+              THIS ACTION CANNOT BE UNDONE!
+            </p>
+          </div>
+
+          <div v-if="userToDelete?.is_admin" class="form-group">
+            <label>Admin User - Type email to confirm:</label>
+            <input
+              v-model="deleteConfirmation"
+              type="text"
+              :placeholder="userToDelete.email"
+              class="form-input"
+            />
+          </div>
+
+          <div class="modal-actions">
+            <button
+              @click="deleteUser"
+              :disabled="loadingDelete || (userToDelete?.is_admin && deleteConfirmation !== userToDelete.email)"
+              class="modal-btn danger"
+            >
+              <span v-if="!loadingDelete">Permanently Delete User</span>
+              <span v-else class="flex items-center justify-center gap-2">
+                <div class="spinner-small"></div>
+                Deleting...
+              </span>
+            </button>
+            <button @click="closeDeleteModal" class="modal-btn secondary">
+              Cancel
             </button>
           </div>
         </div>
@@ -439,12 +507,14 @@ const loading = ref(false);
 const loadingKeys = ref(false);
 const loadingCodes = ref(false);
 const loadingGenerate = ref(false);
+const loadingDelete = ref(false);
 const users = ref([]);
 const stats = ref({});
 const searchQuery = ref('');
 const showKeyModal = ref(false);
 const showDetailsModal = ref(false);
 const showGenerateModal = ref(false);
+const showDeleteModal = ref(false);
 const selectedUser = ref(null);
 const userDetails = ref(null);
 const privateKeys = ref([]);
@@ -452,6 +522,8 @@ const showPrivateKey = ref(false);
 const inviteCodes = ref([]);
 const inviteStats = ref({});
 const generatedCodes = ref([]);
+const userToDelete = ref(null);
+const deleteConfirmation = ref('');
 const generateForm = ref({
   count: 10,
   notes: '',
@@ -651,6 +723,42 @@ const closeGenerateModal = () => {
     notes: '',
     maxUses: 1
   };
+};
+
+// User Deletion Methods
+const confirmDeleteUser = (user) => {
+  userToDelete.value = user;
+  deleteConfirmation.value = '';
+  showDeleteModal.value = true;
+};
+
+const deleteUser = async () => {
+  if (!userToDelete.value) return;
+
+  loadingDelete.value = true;
+  try {
+    const response = await apiHelpers.delete(`/api/admin/users/${userToDelete.value.id}`, {
+      confirmation: deleteConfirmation.value
+    });
+
+    if (response.success) {
+      notificationStore.success('User Deleted', response.message);
+      closeDeleteModal();
+      await fetchUsers(); // Refresh the list
+      await fetchStats(); // Refresh stats
+    }
+  } catch (err) {
+    console.error('Failed to delete user:', err);
+    notificationStore.error('Error', err.message || 'Failed to delete user');
+  } finally {
+    loadingDelete.value = false;
+  }
+};
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false;
+  userToDelete.value = null;
+  deleteConfirmation.value = '';
 };
 
 // Check if user is admin
@@ -898,6 +1006,14 @@ onMounted(() => {
   background: rgba(203, 64, 64, 0.3);
 }
 
+.action-btn.delete {
+  background: rgba(150, 30, 30, 0.2);
+}
+
+.action-btn.delete:hover {
+  background: rgba(150, 30, 30, 0.4);
+}
+
 .loading-state,
 .empty-state {
   padding: 3rem;
@@ -1000,6 +1116,19 @@ onMounted(() => {
   color: #e2e8f0;
   margin-bottom: 0.5rem;
   line-height: 1.6;
+}
+
+.warning-list {
+  list-style: disc;
+  margin-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #e2e8f0;
+  line-height: 1.8;
+}
+
+.warning-list li {
+  margin-bottom: 0.25rem;
 }
 
 .keys-container {

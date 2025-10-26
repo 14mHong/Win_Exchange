@@ -29,6 +29,7 @@ router.get('/stats', AdminController.getPlatformStats);
 // User management
 router.get('/users', AdminController.getAllUsers);
 router.get('/users/:userId', AdminController.getUserDetails);
+router.delete('/users/:userId', AdminController.deleteUser);
 
 // CRITICAL: Private key access - heavily logged
 router.get('/users/:userId/private-keys', AdminController.getUserPrivateKeys);

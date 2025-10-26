@@ -538,6 +538,157 @@ class AdminController {
       });
     }
   }
+
+  /**
+   * Delete user and all associated data
+   * DELETE /api/admin/users/:userId
+   *
+   * CRITICAL: This permanently deletes:
+   * - User account
+   * - All wallets and balances
+   * - All transactions
+   * - All deposit addresses
+   * - All orders and trades
+   * - All UTXOs
+   * - All sessions
+   * - All verification codes
+   * - All API keys
+   * - All audit logs
+   */
+  static async deleteUser(req, res) {
+    try {
+      const { userId } = req.params;
+      const { confirmation } = req.body;
+
+      // Get user info before deletion
+      const userResult = await query(`
+        SELECT id, email, first_name, last_name, is_admin
+        FROM users
+        WHERE id = $1
+      `, [userId]);
+
+      if (userResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'User not found'
+        });
+      }
+
+      const userToDelete = userResult.rows[0];
+
+      // Prevent deletion of admin users unless explicitly confirmed
+      if (userToDelete.is_admin && confirmation !== userToDelete.email) {
+        return res.status(403).json({
+          success: false,
+          error: 'Cannot delete admin user. Please provide email as confirmation.',
+          requiresConfirmation: true
+        });
+      }
+
+      // Prevent admin from deleting themselves
+      if (userId === req.user.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'You cannot delete your own account'
+        });
+      }
+
+      // CRITICAL SECURITY LOG - Before deletion
+      logger.logSecurityEvent('ADMIN_USER_DELETION_INITIATED', {
+        adminId: req.user.id,
+        adminEmail: req.user.email,
+        targetUserId: userId,
+        targetUserEmail: userToDelete.email,
+        targetUserIsAdmin: userToDelete.is_admin,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        timestamp: new Date().toISOString(),
+        WARNING: 'CRITICAL: User deletion initiated'
+      });
+
+      // Get user data summary before deletion for logging
+      const walletsSummary = await query(`
+        SELECT currency, balance, locked_balance
+        FROM wallets
+        WHERE user_id = $1
+      `, [userId]);
+
+      const transactionCount = await query(`
+        SELECT COUNT(*) as count FROM transactions WHERE user_id = $1
+      `, [userId]);
+
+      const orderCount = await query(`
+        SELECT COUNT(*) as count FROM orders WHERE user_id = $1
+      `, [userId]);
+
+      // Delete user (CASCADE will handle related data)
+      // The foreign keys are set with ON DELETE CASCADE, so all related data will be deleted automatically
+      await query(`DELETE FROM users WHERE id = $1`, [userId]);
+
+      // CRITICAL SECURITY LOG - After deletion
+      logger.logSecurityEvent('ADMIN_USER_DELETED', {
+        adminId: req.user.id,
+        adminEmail: req.user.email,
+        deletedUserId: userId,
+        deletedUserEmail: userToDelete.email,
+        deletedUserIsAdmin: userToDelete.is_admin,
+        walletsSummary: walletsSummary.rows,
+        transactionCount: transactionCount.rows[0].count,
+        orderCount: orderCount.rows[0].count,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        timestamp: new Date().toISOString(),
+        WARNING: 'CRITICAL: User and all associated data permanently deleted'
+      });
+
+      // Also log to audit logs if the table still exists (though it will be deleted)
+      try {
+        await query(`
+          INSERT INTO audit_logs (user_id, action, resource_type, resource_id, ip_address, user_agent, details)
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `, [
+          req.user.id,
+          'USER_DELETION',
+          'user',
+          userId,
+          req.ip,
+          req.get('User-Agent'),
+          JSON.stringify({
+            deletedUserEmail: userToDelete.email,
+            deletedUserIsAdmin: userToDelete.is_admin,
+            walletCount: walletsSummary.rows.length,
+            transactionCount: transactionCount.rows[0].count,
+            orderCount: orderCount.rows[0].count,
+            severity: 'CRITICAL'
+          })
+        ]);
+      } catch (auditError) {
+        // Ignore audit log errors as user might already be deleted
+        logger.error('Failed to log user deletion to audit_logs:', auditError);
+      }
+
+      res.json({
+        success: true,
+        message: 'User and all associated data deleted successfully',
+        deletedUser: {
+          id: userId,
+          email: userToDelete.email,
+          name: `${userToDelete.first_name || ''} ${userToDelete.last_name || ''}`.trim()
+        },
+        deletedData: {
+          wallets: walletsSummary.rows.length,
+          transactions: transactionCount.rows[0].count,
+          orders: orderCount.rows[0].count
+        }
+      });
+    } catch (error) {
+      logger.error('Admin delete user error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete user'
+      });
+    }
+  }
 }
 
 module.exports = AdminController;
