@@ -62,9 +62,15 @@ const transaction = async (callback) => {
   }
 };
 
+// Get a client from the pool for manual transaction management
+const getClient = async () => {
+  return await pool.connect();
+};
+
 module.exports = {
   pool,
   query,
   transaction,
-  testConnection
+  testConnection,
+  getClient
 };

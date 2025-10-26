@@ -41,16 +41,23 @@ class InviteCode {
 
   /**
    * Validate and mark code as used
+   * Uses row-level locking to prevent race conditions
    */
   static async validateAndUse(code, userId) {
+    const client = await require('../config/database').getClient();
+
     try {
-      // Check if code exists and is valid
-      const codeResult = await query(`
+      await client.query('BEGIN');
+
+      // Lock the row and check if code exists and is valid (FOR UPDATE prevents concurrent modifications)
+      const codeResult = await client.query(`
         SELECT * FROM invite_codes
         WHERE code = $1
+        FOR UPDATE
       `, [code]);
 
       if (codeResult.rows.length === 0) {
+        await client.query('ROLLBACK');
         return { valid: false, error: 'Invalid invite code' };
       }
 
@@ -58,21 +65,24 @@ class InviteCode {
 
       // Check if active
       if (!inviteCode.is_active) {
+        await client.query('ROLLBACK');
         return { valid: false, error: 'This invite code is no longer active' };
       }
 
       // Check expiration
       if (inviteCode.expires_at && new Date(inviteCode.expires_at) < new Date()) {
+        await client.query('ROLLBACK');
         return { valid: false, error: 'This invite code has expired' };
       }
 
-      // Check usage limit
+      // Check usage limit (CRITICAL: this check happens AFTER row lock)
       if (inviteCode.current_uses >= inviteCode.max_uses) {
+        await client.query('ROLLBACK');
         return { valid: false, error: 'This invite code has already been used' };
       }
 
-      // Mark as used
-      const updateResult = await query(`
+      // Mark as used (atomically increment and update)
+      const updateResult = await client.query(`
         UPDATE invite_codes
         SET
           current_uses = current_uses + 1,
@@ -83,11 +93,16 @@ class InviteCode {
         RETURNING *
       `, [userId, code]);
 
-      logger.info('Invite code used', { code, userId });
+      await client.query('COMMIT');
+
+      logger.info('Invite code used', { code, userId, newUsageCount: updateResult.rows[0].current_uses });
       return { valid: true, inviteCode: updateResult.rows[0] };
     } catch (error) {
+      await client.query('ROLLBACK');
       logger.error('Error validating invite code:', error);
       throw error;
+    } finally {
+      client.release();
     }
   }
 
