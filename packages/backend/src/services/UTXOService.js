@@ -14,14 +14,14 @@ const axios = require('axios');
  */
 class UTXOService {
   constructor() {
-    // Blockchain API configuration (BlockCypher)
+    // Blockchain API configuration (Blockchain.com - Free, no API key required)
     this.blockchainAPI = {
-      BTC: process.env.BLOCKCYPHER_API_URL || 'https://api.blockcypher.com/v1/btc/main',
-      BTC_TEST: 'https://api.blockcypher.com/v1/btc/test3',
-      LTC: process.env.BLOCKCYPHER_API_URL_LTC || 'https://api.blockcypher.com/v1/ltc/main'
+      BTC: 'https://blockchain.info',
+      BTC_TEST: 'https://testnet.blockchain.info',
+      LTC: 'https://api.blockcypher.com/v1/ltc/main' // Keep LTC on BlockCypher for now
     };
 
-    // API token (optional but recommended for higher rate limits)
+    // API token (only for LTC via BlockCypher)
     this.apiToken = process.env.BLOCKCYPHER_TOKEN;
 
     // Minimum confirmations required
@@ -30,7 +30,7 @@ class UTXOService {
       LTC: 6
     };
 
-    logger.info('UTXOService initialized');
+    logger.info('UTXOService initialized with Blockchain.com API for BTC');
   }
 
   /**
@@ -309,24 +309,44 @@ class UTXOService {
   async broadcastTransaction(txHex, currency) {
     try {
       const apiUrl = this.blockchainAPI[currency];
-      const url = this.apiToken
-        ? `${apiUrl}/txs/push?token=${this.apiToken}`
-        : `${apiUrl}/txs/push`;
 
-      const response = await axios.post(url, {
-        tx: txHex
-      });
+      if (currency === 'BTC' || currency === 'BTC_TEST') {
+        // Use Blockchain.com API for Bitcoin
+        const url = `${apiUrl}/pushtx`;
+        const response = await axios.post(url, `tx=${txHex}`, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
 
-      logger.info('Transaction broadcasted', {
-        txHash: response.data.tx.hash,
-        currency
-      });
+        logger.info('Transaction broadcasted via Blockchain.com', {
+          currency
+        });
 
-      return {
-        success: true,
-        txHash: response.data.tx.hash,
-        data: response.data
-      };
+        return {
+          success: true,
+          txHash: response.data, // Blockchain.com returns just the tx hash as string
+          data: response.data
+        };
+      } else {
+        // Use BlockCypher for LTC
+        const url = this.apiToken
+          ? `${apiUrl}/txs/push?token=${this.apiToken}`
+          : `${apiUrl}/txs/push`;
+
+        const response = await axios.post(url, {
+          tx: txHex
+        });
+
+        logger.info('Transaction broadcasted via BlockCypher', {
+          txHash: response.data.tx.hash,
+          currency
+        });
+
+        return {
+          success: true,
+          txHash: response.data.tx.hash,
+          data: response.data
+        };
+      }
     } catch (error) {
       logger.error('Error broadcasting transaction:', error.response?.data || error.message);
       throw new Error(`Failed to broadcast transaction: ${error.response?.data?.error || error.message}`);
@@ -340,66 +360,129 @@ class UTXOService {
   async monitorAddress(address, currency, userId, derivationPath) {
     try {
       const apiUrl = this.blockchainAPI[currency];
-      const url = this.apiToken
-        ? `${apiUrl}/addrs/${address}?token=${this.apiToken}&unspentOnly=true`
-        : `${apiUrl}/addrs/${address}?unspentOnly=true`;
+      let response, addressData;
 
-      const response = await axios.get(url);
-      const addressData = response.data;
+      if (currency === 'BTC' || currency === 'BTC_TEST') {
+        // Use Blockchain.com API for Bitcoin
+        const url = `${apiUrl}/unspent?active=${address}&limit=1000`;
+        response = await axios.get(url);
+        addressData = response.data;
 
-      // Get UTXOs for this address
-      if (addressData.txrefs && addressData.txrefs.length > 0) {
-        for (const txref of addressData.txrefs) {
-          // Check if UTXO already exists
-          const existing = await query(
-            'SELECT id FROM utxos WHERE tx_hash = $1 AND vout = $2 AND currency = $3',
-            [txref.tx_hash, txref.tx_output_n, currency]
-          );
+        // Get UTXOs for this address
+        if (addressData.unspent_outputs && addressData.unspent_outputs.length > 0) {
+          for (const utxo of addressData.unspent_outputs) {
+            // Check if UTXO already exists
+            const existing = await query(
+              'SELECT id FROM utxos WHERE tx_hash = $1 AND vout = $2 AND currency = $3',
+              [utxo.tx_hash_big_endian, utxo.tx_output_n, currency]
+            );
 
-          if (existing.rows.length === 0) {
-            // Add new UTXO
-            await this.addUTXO({
-              txHash: txref.tx_hash,
-              vout: txref.tx_output_n,
-              userId,
-              address,
-              derivationPath,
-              currency,
-              amount: txref.value / 100000000, // Convert satoshi to BTC
-              blockHeight: txref.block_height,
-              confirmations: txref.confirmations,
-              scriptPubKey: txref.script
-            });
-          } else {
-            // Update confirmations
-            await query(`
-              UPDATE utxos
-              SET
-                confirmations = $1,
-                status = CASE
-                  WHEN $1 >= $2 THEN 'confirmed'
-                  ELSE 'unconfirmed'
-                END,
-                updated_at = CURRENT_TIMESTAMP
-              WHERE tx_hash = $3 AND vout = $4 AND currency = $5
-            `, [
-              txref.confirmations,
-              this.minConfirmations[currency],
-              txref.tx_hash,
-              txref.tx_output_n,
-              currency
-            ]);
+            if (existing.rows.length === 0) {
+              // Add new UTXO
+              await this.addUTXO({
+                txHash: utxo.tx_hash_big_endian,
+                vout: utxo.tx_output_n,
+                userId,
+                address,
+                derivationPath,
+                currency,
+                amount: utxo.value / 100000000, // Convert satoshi to BTC
+                blockHeight: null, // Blockchain.com doesn't provide this in unspent endpoint
+                confirmations: utxo.confirmations,
+                scriptPubKey: utxo.script
+              });
+            } else {
+              // Update confirmations
+              await query(`
+                UPDATE utxos
+                SET
+                  confirmations = $1,
+                  status = CASE
+                    WHEN $1 >= $2 THEN 'confirmed'
+                    ELSE 'unconfirmed'
+                  END,
+                  updated_at = CURRENT_TIMESTAMP
+                WHERE tx_hash = $3 AND vout = $4 AND currency = $5
+              `, [
+                utxo.confirmations,
+                this.minConfirmations[currency],
+                utxo.tx_hash_big_endian,
+                utxo.tx_output_n,
+                currency
+              ]);
+            }
           }
         }
-      }
 
-      return {
-        success: true,
-        address,
-        balance: addressData.balance,
-        unconfirmedBalance: addressData.unconfirmed_balance,
-        utxoCount: addressData.n_tx
-      };
+        return {
+          success: true,
+          address,
+          utxoCount: addressData.unspent_outputs ? addressData.unspent_outputs.length : 0
+        };
+
+      } else {
+        // Use BlockCypher for LTC (keep existing code)
+        const url = this.apiToken
+          ? `${apiUrl}/addrs/${address}?token=${this.apiToken}&unspentOnly=true`
+          : `${apiUrl}/addrs/${address}?unspentOnly=true`;
+
+        response = await axios.get(url);
+        addressData = response.data;
+
+        // Get UTXOs for this address
+        if (addressData.txrefs && addressData.txrefs.length > 0) {
+          for (const txref of addressData.txrefs) {
+            // Check if UTXO already exists
+            const existing = await query(
+              'SELECT id FROM utxos WHERE tx_hash = $1 AND vout = $2 AND currency = $3',
+              [txref.tx_hash, txref.tx_output_n, currency]
+            );
+
+            if (existing.rows.length === 0) {
+              // Add new UTXO
+              await this.addUTXO({
+                txHash: txref.tx_hash,
+                vout: txref.tx_output_n,
+                userId,
+                address,
+                derivationPath,
+                currency,
+                amount: txref.value / 100000000, // Convert satoshi to BTC
+                blockHeight: txref.block_height,
+                confirmations: txref.confirmations,
+                scriptPubKey: txref.script
+              });
+            } else {
+              // Update confirmations
+              await query(`
+                UPDATE utxos
+                SET
+                  confirmations = $1,
+                  status = CASE
+                    WHEN $1 >= $2 THEN 'confirmed'
+                    ELSE 'unconfirmed'
+                  END,
+                  updated_at = CURRENT_TIMESTAMP
+                WHERE tx_hash = $3 AND vout = $4 AND currency = $5
+              `, [
+                txref.confirmations,
+                this.minConfirmations[currency],
+                txref.tx_hash,
+                txref.tx_output_n,
+                currency
+              ]);
+            }
+          }
+        }
+
+        return {
+          success: true,
+          address,
+          balance: addressData.balance,
+          unconfirmedBalance: addressData.unconfirmed_balance,
+          utxoCount: addressData.n_tx
+        };
+      }
     } catch (error) {
       logger.error('Error monitoring address:', error);
       throw error;
@@ -411,19 +494,31 @@ class UTXOService {
    */
   async getRecommendedFeeRate(currency) {
     try {
-      const apiUrl = this.blockchainAPI[currency];
-      const url = this.apiToken
-        ? `${apiUrl}?token=${this.apiToken}`
-        : apiUrl;
+      if (currency === 'BTC' || currency === 'BTC_TEST') {
+        // Blockchain.com doesn't provide fee API, use mempool.space instead (free)
+        const url = 'https://mempool.space/api/v1/fees/recommended';
+        const response = await axios.get(url);
 
-      const response = await axios.get(url);
+        return {
+          high: response.data.fastestFee,
+          medium: response.data.halfHourFee,
+          low: response.data.hourFee
+        };
+      } else {
+        // Use BlockCypher for LTC
+        const apiUrl = this.blockchainAPI[currency];
+        const url = this.apiToken
+          ? `${apiUrl}?token=${this.apiToken}`
+          : apiUrl;
 
-      // BlockCypher provides fee estimates
-      return {
-        high: response.data.high_fee_per_kb / 1024, // Convert to per byte
-        medium: response.data.medium_fee_per_kb / 1024,
-        low: response.data.low_fee_per_kb / 1024
-      };
+        const response = await axios.get(url);
+
+        return {
+          high: response.data.high_fee_per_kb / 1024, // Convert to per byte
+          medium: response.data.medium_fee_per_kb / 1024,
+          low: response.data.low_fee_per_kb / 1024
+        };
+      }
     } catch (error) {
       logger.error('Error getting fee rate:', error);
       // Return default values if API fails
