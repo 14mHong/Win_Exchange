@@ -11,7 +11,18 @@ class InviteCodeController {
   static async getPaymentConfig(req, res) {
     try {
       const config = EthereumService.getPaymentConfig();
-      const ethPriceUSD = await EthereumService.getEthPriceUSD();
+
+      // Get ETH price from CoinGecko cache (won't make new API call if recently cached)
+      const CoinGeckoService = require('../services/CoinGeckoService');
+      let ethPriceUSD = 2500; // Fallback price
+
+      try {
+        // This will use cached price if available (30 second cache)
+        ethPriceUSD = await CoinGeckoService.getPrice('ETH');
+      } catch (priceError) {
+        logger.warn('Could not fetch ETH price, using fallback', { error: priceError.message });
+        // Use fallback price, don't throw error
+      }
 
       res.json({
         success: true,
