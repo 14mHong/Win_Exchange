@@ -3,6 +3,7 @@ const axios = require('axios');
 class CoinGeckoService {
   constructor() {
     this.baseURL = 'https://api.coingecko.com/api/v3';
+    this.fallbackURL = 'https://min-api.cryptocompare.com/data/pricemulti';
     this.cache = new Map();
     this.cacheDuration = 30000; // 30 seconds cache
 
@@ -77,6 +78,32 @@ class CoinGeckoService {
       this.setCache(cacheKey, price);
       return price;
     } catch (error) {
+      // If CoinGecko fails (especially rate limit), try CryptoCompare fallback
+      if (error.response?.status === 429 || error.code === 'ECONNABORTED') {
+        console.log(`CoinGecko rate limited, using CryptoCompare fallback for ${symbol}`);
+        try {
+          const fallbackResponse = await axios.get(this.fallbackURL, {
+            params: {
+              fsyms: upperSymbol,
+              tsyms: 'USD'
+            },
+            timeout: 10000
+          });
+
+          const price = fallbackResponse.data[upperSymbol]?.USD;
+
+          if (!price) {
+            throw new Error(`Price not available for ${symbol}`);
+          }
+
+          this.setCache(cacheKey, price);
+          return price;
+        } catch (fallbackError) {
+          console.error(`CryptoCompare fallback also failed for ${symbol}:`, fallbackError.message);
+          throw new Error(`Failed to fetch price for ${symbol} from both APIs`);
+        }
+      }
+
       console.error(`Error fetching price for ${symbol}:`, error.message);
       throw new Error(`Failed to fetch price for ${symbol}`);
     }
@@ -123,6 +150,37 @@ class CoinGeckoService {
       this.setCache(cacheKey, prices);
       return prices;
     } catch (error) {
+      // If CoinGecko fails (especially rate limit), try CryptoCompare fallback
+      if (error.response?.status === 429 || error.code === 'ECONNABORTED') {
+        console.log(`CoinGecko rate limited, using CryptoCompare fallback for multiple prices`);
+        try {
+          const symbolsUpper = symbols.map(s => s.toUpperCase());
+          const fallbackResponse = await axios.get(this.fallbackURL, {
+            params: {
+              fsyms: symbolsUpper.join(','),
+              tsyms: 'USD'
+            },
+            timeout: 10000
+          });
+
+          const prices = {};
+          symbolsUpper.forEach(symbol => {
+            if (fallbackResponse.data[symbol]?.USD) {
+              prices[symbol] = fallbackResponse.data[symbol].USD;
+            }
+          });
+
+          this.setCache(cacheKey, prices);
+          return prices;
+        } catch (fallbackError) {
+          console.error('CryptoCompare fallback also failed for multiple prices:', {
+            message: fallbackError.message,
+            symbols
+          });
+          throw new Error(`Failed to fetch prices from both APIs: ${fallbackError.message}`);
+        }
+      }
+
       console.error('Error fetching multiple prices:', {
         message: error.message,
         response: error.response?.data,
