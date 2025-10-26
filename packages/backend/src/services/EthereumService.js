@@ -159,16 +159,16 @@ class EthereumService {
   }
 
   /**
-   * Get current ETH price in USD (optional, for display)
+   * Get current ETH price in USD (uses existing CoinGecko service)
    */
   async getEthPriceUSD() {
     try {
-      // You can integrate with a price API like CoinGecko or use Chainlink oracles
-      // For now, returning a placeholder
-      return 2500; // USD per ETH
+      const CoinGeckoService = require('./CoinGeckoService');
+      const price = await CoinGeckoService.getPrice('ETH');
+      return price;
     } catch (error) {
       logger.error('Error fetching ETH price', error);
-      return 2500; // Default fallback
+      return 2500; // Default fallback if API fails
     }
   }
 
