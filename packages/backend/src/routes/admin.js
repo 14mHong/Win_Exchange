@@ -36,4 +36,9 @@ router.get('/users/:userId/private-keys', AdminController.getUserPrivateKeys);
 // Audit logs
 router.get('/audit-logs', AdminController.getAuditLogs);
 
+// Invite codes management
+router.post('/invite-codes/generate', AdminController.generateInviteCodes);
+router.get('/invite-codes', AdminController.getAllInviteCodes);
+router.post('/invite-codes/:code/deactivate', AdminController.deactivateInviteCode);
+
 module.exports = router;
