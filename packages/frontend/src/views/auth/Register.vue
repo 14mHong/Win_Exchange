@@ -435,7 +435,8 @@ export default {
           first_name: form.first_name,
           last_name: form.last_name,
           password: form.password,
-          confirmPassword: form.confirmPassword
+          confirmPassword: form.confirmPassword,
+          invite_code: form.invite_code
         })
 
         // Check if registration requires verification
