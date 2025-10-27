@@ -853,13 +853,127 @@ onMounted(() => {
     padding: 1rem;
   }
 
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
   .status-card {
     flex-direction: column;
     text-align: center;
+    padding: 1.25rem;
+  }
+
+  .security-card {
+    padding: 1.25rem;
+  }
+
+  .card-title {
+    font-size: 1.125rem;
   }
 
   .info-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .security-page {
+    padding: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .page-header p {
+    font-size: 0.875rem;
+  }
+
+  .status-card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .status-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+
+  .status-title {
+    font-size: 1rem;
+  }
+
+  .status-description {
+    font-size: 0.813rem;
+  }
+
+  .security-card {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-description {
+    font-size: 0.813rem;
+  }
+
+  .info-grid {
+    gap: 0.75rem;
+  }
+
+  .info-label {
+    font-size: 0.75rem;
+  }
+
+  .info-value {
+    font-size: 0.875rem;
+  }
+
+  .btn {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.813rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .security-page {
+    padding: 0.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.125rem;
+  }
+
+  .status-card {
+    padding: 0.875rem;
+  }
+
+  .status-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .security-card {
+    padding: 0.875rem;
+  }
+
+  .card-title {
+    font-size: 0.938rem;
+  }
+
+  .btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
   }
 }
 </style>

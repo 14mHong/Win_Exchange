@@ -1465,17 +1465,35 @@ onMounted(() => {
     padding: 1rem;
   }
 
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
   }
 
   .invite-stats-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 
   .section-header {
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.125rem;
   }
 
   .search-box {
@@ -1484,15 +1502,136 @@ onMounted(() => {
   }
 
   .table-container {
-    overflow-x: scroll;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .users-table {
+    font-size: 0.875rem;
+    min-width: 800px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 0.75rem 0.5rem;
   }
 
   .modal-content {
     max-width: 100%;
+    margin: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
   }
 
   .codes-list {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .action-btn {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-page {
+    padding: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .page-header p {
+    font-size: 0.875rem;
+  }
+
+  .stats-grid {
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 0.875rem;
+  }
+
+  .stat-icon {
+    font-size: 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
+  .invite-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .users-table {
+    font-size: 0.75rem;
+    min-width: 700px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 0.625rem 0.375rem;
+  }
+
+  .status-badge {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+  }
+
+  .modal-content {
+    margin: 0.5rem;
+  }
+
+  .generate-btn,
+  .btn {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-page {
+    padding: 0.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.125rem;
+  }
+
+  .stat-card {
+    padding: 0.75rem;
+  }
+
+  .stat-icon {
+    font-size: 1.25rem;
+  }
+
+  .stat-value {
+    font-size: 1.125rem;
+  }
+
+  .users-table {
+    min-width: 600px;
+  }
+
+  .action-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.688rem;
   }
 }
 </style>

@@ -995,23 +995,133 @@ onMounted(() => {
     padding: 1rem;
   }
 
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .settings-card {
+    padding: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .preference-item {
     flex-direction: column;
     text-align: center;
+    padding: 1rem;
   }
 
   .session-item {
     flex-direction: column;
     text-align: center;
+    padding: 1rem;
   }
 
   .provider-badge {
     font-size: 0.75rem;
     padding: 0.375rem 0.75rem;
+  }
+
+  .btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .settings-page {
+    padding: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .page-header p {
+    font-size: 0.875rem;
+  }
+
+  .settings-card {
+    padding: 1rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .form-group label {
+    font-size: 0.813rem;
+  }
+
+  .form-input {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+  }
+
+  .preference-item,
+  .session-item {
+    padding: 0.875rem;
+  }
+
+  .preference-title,
+  .session-title {
+    font-size: 0.938rem;
+  }
+
+  .preference-description,
+  .session-info {
+    font-size: 0.75rem;
+  }
+
+  .btn {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.813rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-page {
+    padding: 0.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.125rem;
+  }
+
+  .settings-card {
+    padding: 0.875rem;
+  }
+
+  .section-title {
+    font-size: 0.938rem;
+  }
+
+  .form-input {
+    padding: 0.5rem;
+    font-size: 0.813rem;
+  }
+
+  .preference-item,
+  .session-item {
+    padding: 0.75rem;
+  }
+
+  .btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .provider-badge {
+    font-size: 0.688rem;
+    padding: 0.25rem 0.5rem;
   }
 }
 </style>
