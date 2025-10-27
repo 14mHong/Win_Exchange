@@ -42,7 +42,7 @@
             <select
               v-model="filters.orderType"
               @change="applyFilters"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All Orders</option>
               <option value="limit">Limit Orders</option>
@@ -58,7 +58,7 @@
             <select
               v-model="filters.status"
               @change="applyFilters"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All Status</option>
               <option value="open">Open</option>
@@ -77,7 +77,7 @@
             <select
               v-model="filters.token"
               @change="applyFilters"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
             >
               <option value="all">All Tokens</option>
               <option v-for="token in tokens" :key="token" :value="token">{{ token }}</option>

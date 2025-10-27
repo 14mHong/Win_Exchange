@@ -20,7 +20,7 @@
             <select
               v-model="filters.type"
               @change="applyFilters"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-800 dark:text-white"
             >
               <option value="">All Types</option>
               <option value="deposit">Deposits</option>
@@ -36,7 +36,7 @@
             <select
               v-model="filters.currency"
               @change="applyFilters"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-800 dark:text-white"
             >
               <option value="">All Currencies</option>
               <option value="BTC">Bitcoin (BTC)</option>
@@ -55,7 +55,7 @@
             <select
               v-model="filters.status"
               @change="applyFilters"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-800 dark:text-white"
             >
               <option value="">All Statuses</option>
               <option value="pending">Pending</option>

@@ -149,7 +149,7 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <router-link
         to="/trading"
-        class="relative group bg-white dark:bg-dark-700 p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg shadow hover:shadow-md transition-shadow"
+        class="relative group bg-white dark:bg-dark-700 p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg shadow hover:shadow-md transition-shadow"
       >
         <div class="flex items-center">
           <span class="rounded-lg inline-flex p-2 bg-green-50 dark:bg-green-900 text-green-600 dark:text-green-400 group-hover:bg-green-100 dark:group-hover:bg-green-800">
@@ -180,7 +180,7 @@
 
       <router-link
         to="/wallet"
-        class="relative group bg-white dark:bg-dark-700 p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg shadow hover:shadow-md transition-shadow"
+        class="relative group bg-white dark:bg-dark-700 p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg shadow hover:shadow-md transition-shadow"
       >
         <div class="flex items-center">
           <span class="rounded-lg inline-flex p-2 bg-green-50 dark:bg-green-900 text-green-600 dark:text-green-400 group-hover:bg-green-100 dark:group-hover:bg-green-800">
@@ -211,7 +211,7 @@
 
       <router-link
         to="/orders"
-        class="relative group bg-white dark:bg-dark-700 p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg shadow hover:shadow-md transition-shadow"
+        class="relative group bg-white dark:bg-dark-700 p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg shadow hover:shadow-md transition-shadow"
       >
         <div class="flex items-center">
           <span class="rounded-lg inline-flex p-2 bg-yellow-50 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400 group-hover:bg-yellow-100 dark:group-hover:bg-yellow-800">

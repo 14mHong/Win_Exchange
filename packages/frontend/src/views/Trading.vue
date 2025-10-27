@@ -18,7 +18,7 @@
                 <select
                   v-model="selectedPair"
                   @change="onPairChange"
-                  class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
                 >
                   <optgroup label="WIN Token Pairs">
                     <option value="WIN/USDT">WIN/USDT</option>
@@ -105,7 +105,7 @@
                   type="number"
                   step="0.00001"
                   placeholder="0.00"
-                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
                 />
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Order will execute when price reaches {{ orderPrice || '0' }} {{ quoteCurrency }}
@@ -123,7 +123,7 @@
                   type="number"
                   step="0.01"
                   placeholder="0.00"
-                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white"
                 />
                 <div class="flex justify-between mt-2 text-sm">
                   <span class="text-gray-600 dark:text-gray-400">

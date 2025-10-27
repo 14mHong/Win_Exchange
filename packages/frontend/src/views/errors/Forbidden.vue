@@ -31,7 +31,7 @@
         <div class="space-y-4">
           <router-link 
             to="/" 
-            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           >
             <svg
               class="mr-2 -ml-1 w-5 h-5"
@@ -51,7 +51,7 @@
           
           <div class="text-center">
             <button 
-              class="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
+              class="text-green-600 hover:text-green-500 text-sm font-medium"
               @click="goBack"
             >
               ← Go back to previous page

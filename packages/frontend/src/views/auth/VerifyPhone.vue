@@ -24,7 +24,7 @@
                 id="phone"
                 v-model="phoneNumber"
                 type="tel"
-                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                 placeholder="+1 (555) 123-4567"
                 disabled
               >
@@ -42,7 +42,7 @@
                 v-model="verificationCode"
                 type="text"
                 maxlength="6"
-                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                 placeholder="Enter 6-digit code"
                 required
               >
@@ -52,7 +52,7 @@
               <button
                 type="button"
                 :disabled="loading || countdown > 0"
-                class="text-sm text-indigo-600 hover:text-indigo-500 disabled:text-gray-400"
+                class="text-sm text-green-600 hover:text-green-500 disabled:text-gray-400"
                 @click="resendCode"
               >
                 {{ countdown > 0 ? `Resend in ${countdown}s` : 'Resend code' }}
@@ -66,14 +66,14 @@
               <button
                 type="submit"
                 :disabled="loading || verificationCode.length !== 6"
-                class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400"
+                class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400"
               >
                 {{ loading ? 'Verifying...' : 'Verify Phone Number' }}
               </button>
 
               <button
                 type="button"
-                class="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                class="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 @click="$router.push('/dashboard')"
               >
                 Skip for now
