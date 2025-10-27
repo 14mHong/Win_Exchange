@@ -485,4 +485,137 @@ fetchSupportedCurrencies();
 .retry-btn:hover {
   background: #3182ce;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .deposit-page {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .currency-selector {
+    padding: 1rem;
+  }
+
+  .currency-btn {
+    padding: 0.75rem;
+  }
+
+  .currency-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.625rem;
+  }
+
+  .deposit-address-card {
+    padding: 1rem;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .card-header h3 {
+    font-size: 1.125rem;
+  }
+
+  .qr-code-wrapper {
+    padding: 0.75rem;
+  }
+
+  .qr-canvas {
+    max-width: 200px;
+    height: auto;
+  }
+
+  .address-box {
+    flex-direction: column;
+  }
+
+  .address-input {
+    font-size: 0.75rem;
+    padding: 0.625rem;
+    word-break: break-all;
+  }
+
+  .copy-btn {
+    padding: 0.625rem 1rem;
+    justify-content: center;
+  }
+
+  .warning-box {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.875rem;
+  }
+
+  .warning-box ul {
+    font-size: 0.813rem;
+  }
+
+  .network-info {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .info-item {
+    padding: 0.75rem;
+  }
+
+  .info-item .value {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .deposit-page {
+    padding: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .page-header p {
+    font-size: 0.875rem;
+  }
+
+  .currency-selector {
+    padding: 0.75rem;
+  }
+
+  .currency-btn {
+    padding: 0.5rem;
+  }
+
+  .currency-btn .text-left div {
+    font-size: 0.75rem;
+  }
+
+  .currency-btn .text-xs {
+    font-size: 0.625rem;
+  }
+
+  .deposit-address-card {
+    padding: 0.875rem;
+  }
+
+  .qr-code-wrapper {
+    padding: 0.5rem;
+  }
+
+  .qr-canvas {
+    max-width: 180px;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
 </style>

@@ -62,6 +62,12 @@ const isActive = (path) => {
   padding: 2rem;
 }
 
+@media (max-width: 640px) {
+  .wallet-page {
+    padding: 1rem;
+  }
+}
+
 .wallet-header {
   margin-bottom: 2rem;
 }

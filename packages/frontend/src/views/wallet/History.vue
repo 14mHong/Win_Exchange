@@ -562,4 +562,77 @@ export default {
 .dark .max-h-\[90vh\]::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .history-page {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .filters-section {
+    padding: 1rem;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .transactions-table {
+    font-size: 0.875rem;
+  }
+
+  .transactions-table th,
+  .transactions-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  /* Make table scrollable horizontally on mobile */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .transactions-table {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .history-page {
+    padding: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .page-header p {
+    font-size: 0.875rem;
+  }
+
+  .filters-section {
+    padding: 0.75rem;
+  }
+
+  .transactions-table {
+    font-size: 0.75rem;
+    min-width: 550px;
+  }
+
+  .transactions-table th,
+  .transactions-table td {
+    padding: 0.5rem 0.375rem;
+  }
+
+  .status-badge,
+  .type-badge {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+  }
+}
 </style>
