@@ -423,16 +423,253 @@ onMounted(() => {
     padding: 1rem;
   }
 
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .page-header p {
+    font-size: 0.875rem;
+  }
+
   .quick-actions-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .action-card {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .action-icon {
+    font-size: 2rem;
+    width: 56px;
+    height: 56px;
+  }
+
+  .action-title {
+    font-size: 1.125rem;
+  }
+
+  .action-description {
+    font-size: 0.813rem;
+  }
+
+  .action-arrow {
+    font-size: 1.5rem;
+  }
+
+  .account-summary,
+  .verification-section {
+    padding: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
   }
 
   .summary-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .summary-item {
+    padding: 1rem;
+  }
+
+  .summary-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .summary-label {
+    font-size: 0.688rem;
+  }
+
+  .summary-value {
+    font-size: 0.938rem;
   }
 
   .verification-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .verification-item {
+    padding: 1rem;
+  }
+
+  .verification-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+
+  .verification-title {
+    font-size: 0.938rem;
+  }
+
+  .verification-status {
+    font-size: 0.813rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .account-page {
+    padding: 0.75rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .page-header p {
+    font-size: 0.813rem;
+  }
+
+  .quick-actions-grid {
+    gap: 0.75rem;
+  }
+
+  .action-card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .action-icon {
+    font-size: 1.75rem;
+    width: 48px;
+    height: 48px;
+  }
+
+  .action-title {
+    font-size: 1rem;
+  }
+
+  .action-description {
+    font-size: 0.75rem;
+  }
+
+  .action-arrow {
+    font-size: 1.25rem;
+  }
+
+  .account-summary,
+  .verification-section {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .summary-grid {
+    gap: 0.75rem;
+  }
+
+  .summary-item {
+    padding: 0.875rem;
+    gap: 0.75rem;
+  }
+
+  .summary-icon {
+    font-size: 1.25rem;
+    width: 36px;
+    height: 36px;
+  }
+
+  .summary-label {
+    font-size: 0.625rem;
+  }
+
+  .summary-value {
+    font-size: 0.875rem;
+  }
+
+  .verification-grid {
+    gap: 0.75rem;
+  }
+
+  .verification-item {
+    padding: 0.875rem;
+  }
+
+  .verification-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .verification-title {
+    font-size: 0.875rem;
+  }
+
+  .verification-status {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .account-page {
+    padding: 0.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.125rem;
+  }
+
+  .action-card {
+    padding: 0.875rem;
+    gap: 0.625rem;
+  }
+
+  .action-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .action-title {
+    font-size: 0.938rem;
+  }
+
+  .action-description {
+    font-size: 0.688rem;
+  }
+
+  .account-summary,
+  .verification-section {
+    padding: 0.875rem;
+  }
+
+  .section-title {
+    font-size: 0.938rem;
+  }
+
+  .summary-item,
+  .verification-item {
+    padding: 0.75rem;
+    gap: 0.625rem;
+  }
+
+  .summary-icon {
+    font-size: 1.125rem;
+    width: 32px;
+    height: 32px;
+  }
+
+  .verification-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.125rem;
   }
 }
 </style>
