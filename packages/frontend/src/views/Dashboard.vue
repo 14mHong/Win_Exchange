@@ -584,3 +584,140 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* Mobile Responsive Styles */
+@media (max-width: 1024px) {
+  /* Make table scrollable on tablets */
+  .overflow-hidden {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Header adjustments */
+  .space-y-6 > div:first-child h2 {
+    font-size: 1.5rem;
+  }
+
+  /* Stats grid - 1 column on mobile */
+  .grid.sm\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Quick actions - stack vertically */
+  .grid.sm\\:grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Table adjustments */
+  table {
+    font-size: 0.875rem;
+    min-width: 700px;
+  }
+
+  th, td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  /* Smaller icon in stats */
+  .w-10.h-10 {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  /* Token icon in table */
+  .flex-shrink-0.h-10.w-10 {
+    height: 2rem;
+    width: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Even more compact on small phones */
+  .space-y-6 {
+    padding: 0 0.5rem;
+  }
+
+  .space-y-6 > div:first-child h2 {
+    font-size: 1.25rem;
+  }
+
+  .space-y-6 > div:first-child p {
+    font-size: 0.875rem;
+  }
+
+  /* Stats cards */
+  .bg-white.dark\\:bg-dark-800.overflow-hidden {
+    padding: 0;
+  }
+
+  .bg-white.dark\\:bg-dark-800.overflow-hidden .p-5 {
+    padding: 1rem;
+  }
+
+  /* Stat values */
+  dd.text-2xl {
+    font-size: 1.25rem;
+  }
+
+  /* Quick action cards */
+  .relative.group.bg-white {
+    padding: 0.75rem;
+  }
+
+  /* Table */
+  table {
+    font-size: 0.75rem;
+    min-width: 600px;
+  }
+
+  th {
+    padding: 0.5rem 0.375rem;
+    font-size: 0.625rem;
+  }
+
+  td {
+    padding: 0.625rem 0.375rem;
+  }
+
+  /* Hide some table columns on very small screens */
+  th:nth-child(3),
+  td:nth-child(3) {
+    display: none;
+  }
+
+  /* Refresh button - smaller */
+  .inline-flex.items-center.px-4 {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small phones - hide locked column too */
+  th:nth-child(2),
+  td:nth-child(2),
+  th:nth-child(3),
+  td:nth-child(3) {
+    display: none;
+  }
+
+  table {
+    min-width: 450px;
+  }
+
+  /* Stack action links vertically */
+  td:last-child div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-end;
+  }
+}
+</style>
