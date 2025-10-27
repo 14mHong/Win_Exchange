@@ -289,13 +289,13 @@ fetchSupportedCurrencies();
 }
 
 .currency-btn:hover {
-  border-color: #4299e1;
+  border-color: #22c55e;
   transform: translateY(-2px);
 }
 
 .currency-btn.active {
-  border-color: #4299e1;
-  background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(72, 187, 120, 0.1));
+  border-color: #22c55e;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(72, 187, 120, 0.1));
 }
 
 .currency-icon {
@@ -327,7 +327,7 @@ fetchSupportedCurrencies();
 
 .badge {
   background: #2d3748;
-  color: #4299e1;
+  color: #22c55e;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.875rem;
@@ -371,7 +371,7 @@ fetchSupportedCurrencies();
 }
 
 .copy-btn {
-  background: #4299e1;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 8px;
@@ -443,7 +443,7 @@ fetchSupportedCurrencies();
   width: 48px;
   height: 48px;
   border: 4px solid #2d3748;
-  border-top-color: #4299e1;
+  border-top-color: #22c55e;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto;
@@ -472,7 +472,7 @@ fetchSupportedCurrencies();
 }
 
 .retry-btn {
-  background: #4299e1;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 8px;

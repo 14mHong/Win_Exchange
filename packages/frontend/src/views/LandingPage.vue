@@ -6,7 +6,7 @@
         <div class="text-center">
           <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
             Trade Crypto with
-            <span class="text-blue-600 dark:text-blue-400">Confidence</span>
+            <span class="text-green-600 dark:text-green-400">Confidence</span>
           </h1>
           <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Professional cryptocurrency exchange with advanced trading tools, 
@@ -21,13 +21,13 @@
             </router-link>
             <router-link
               to="/register"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Get Started
             </router-link>
             <router-link
               to="/login"
-              class="border border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-8 py-3 rounded-lg font-semibold transition-colors"
+              class="border border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Sign In
             </router-link>
@@ -64,7 +64,7 @@
           >
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold">
                   {{ token.symbol.substring(0, 2) }}
                 </div>
                 <div>
@@ -103,7 +103,7 @@
         <div v-if="!showAllTokens && marketData.length > 8" class="text-center mb-12">
           <button
             @click="showAllTokens = true"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+            class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
           >
             View All {{ marketData.length }} Tokens
           </button>
@@ -134,7 +134,7 @@
                   :class="[
                     'px-3 py-1 text-sm font-medium rounded transition-colors',
                     selectedTimeRange === range.value
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-green-600 text-white'
                       : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
                   ]"
                 >
@@ -171,7 +171,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="text-center">
-            <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 class="w-8 h-8 text-white"
                 fill="none"

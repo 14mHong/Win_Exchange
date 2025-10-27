@@ -8,7 +8,7 @@
             to="/" 
             class="flex items-center space-x-2"
           >
-            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+            <div class="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
               <span class="text-white font-bold text-sm">WIN</span>
             </div>
             <span class="font-bold text-xl text-gray-900 dark:text-white">
@@ -21,24 +21,24 @@
         <nav class="hidden md:flex items-center space-x-8">
           <a 
             href="#markets" 
-            class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors"
           >
             Markets
           </a>
           <a 
             href="#features" 
-            class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors"
           >
             Features
           </a>
           <button 
-            class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors"
             @click="openTradingWithAuth"
           >
             Trading
           </button>
           <button 
-            class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors"
             @click="openWalletWithAuth"
           >
             Wallet
@@ -85,13 +85,13 @@
 
           <router-link
             to="/login"
-            class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors"
           >
             Sign In
           </router-link>
           <router-link
             to="/register"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
           >
             Get Started
           </router-link>
@@ -126,26 +126,26 @@
         <div class="flex flex-col space-y-4">
           <a 
             href="#markets" 
-            class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors"
             @click="mobileMenuOpen = false"
           >
             Markets
           </a>
           <a 
             href="#features" 
-            class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            class="text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors"
             @click="mobileMenuOpen = false"
           >
             Features
           </a>
           <button 
-            class="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            class="text-left text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors"
             @click="openTradingWithAuth"
           >
             Trading
           </button>
           <button 
-            class="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            class="text-left text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors"
             @click="openWalletWithAuth"
           >
             Wallet
@@ -153,14 +153,14 @@
           <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
             <router-link
               to="/login"
-              class="block text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors mb-2"
+              class="block text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors mb-2"
               @click="mobileMenuOpen = false"
             >
               Sign In
             </router-link>
             <router-link
               to="/register"
-              class="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-center"
+              class="block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-center"
               @click="mobileMenuOpen = false"
             >
               Get Started

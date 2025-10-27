@@ -75,7 +75,7 @@
                     :class="[
                       'flex-1 py-2 px-4 rounded-lg font-medium transition-colors',
                       orderType === 'market'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-green-600 text-white'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                     ]"
                   >
@@ -86,7 +86,7 @@
                     :class="[
                       'flex-1 py-2 px-4 rounded-lg font-medium transition-colors',
                       orderType === 'limit'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-green-600 text-white'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                     ]"
                   >
@@ -131,7 +131,7 @@
                   </span>
                   <button
                     @click="setMaxAmount"
-                    class="text-blue-600 hover:text-blue-700 font-medium"
+                    class="text-green-600 hover:text-green-700 font-medium"
                   >
                     Max
                   </button>
@@ -218,7 +218,7 @@
               <button
                 v-if="limitOrders.length > 0"
                 @click="fetchLimitOrders"
-                class="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                class="text-sm text-green-600 hover:text-green-700 font-medium"
               >
                 Refresh
               </button>
@@ -277,7 +277,7 @@
               <button
                 v-if="swapHistory.length > 0"
                 @click="fetchSwapHistory"
-                class="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                class="text-sm text-green-600 hover:text-green-700 font-medium"
               >
                 Refresh
               </button>

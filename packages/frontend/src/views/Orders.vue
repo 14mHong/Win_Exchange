@@ -11,7 +11,7 @@
           <button
             @click="refreshOrders"
             :disabled="isLoading"
-            class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            class="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
             <svg
               :class="['w-4 h-4 mr-2', { 'animate-spin': isLoading }]"
@@ -100,7 +100,7 @@
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
           <p class="mt-4 text-gray-500 dark:text-gray-400">Loading orders...</p>
         </div>
 
@@ -110,7 +110,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p class="text-red-600 dark:text-red-400 mb-4">{{ error }}</p>
-          <button @click="refreshOrders" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button @click="refreshOrders" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
             Try Again
           </button>
         </div>
@@ -158,7 +158,7 @@
                         'px-2 py-1 text-xs font-semibold rounded',
                         order.order_type === 'limit'
                           ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                          : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                       ]"
                     >
                       {{ order.order_type === 'limit' ? 'Limit' : 'Market' }}
@@ -276,7 +276,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
           <p class="text-gray-500 dark:text-gray-400 mb-4">No orders found</p>
-          <router-link to="/trading" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <router-link to="/trading" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
             Start Trading
           </router-link>
         </div>

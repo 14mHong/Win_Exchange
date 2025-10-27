@@ -100,7 +100,7 @@ const isActive = (path) => {
 
 .tab:hover {
   color: white;
-  background: rgba(66, 153, 225, 0.1);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .tab.active {

@@ -92,11 +92,11 @@
           </div>
 
           <!-- Instructions -->
-          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <h3 class="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+          <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <h3 class="font-semibold text-green-900 dark:text-green-100 mb-2">
               Payment Instructions:
             </h3>
-            <ol class="list-decimal list-inside space-y-1 text-sm text-blue-800 dark:text-blue-200">
+            <ol class="list-decimal list-inside space-y-1 text-sm text-green-800 dark:text-green-200">
               <li>Send exactly <strong>{{ paymentConfig.priceETH }} ETH</strong> to the address above</li>
               <li>Wait for at least {{ paymentConfig.minConfirmations }} confirmations</li>
               <li>Copy your transaction hash from your wallet</li>

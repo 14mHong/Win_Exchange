@@ -492,13 +492,13 @@ fetchSupportedCurrencies();
 }
 
 .currency-btn:hover {
-  border-color: #4299e1;
+  border-color: #22c55e;
   transform: translateY(-2px);
 }
 
 .currency-btn.active {
-  border-color: #4299e1;
-  background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(72, 187, 120, 0.1));
+  border-color: #22c55e;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(72, 187, 120, 0.1));
 }
 
 .currency-icon {
@@ -562,7 +562,7 @@ fetchSupportedCurrencies();
 
 .form-input:focus {
   outline: none;
-  border-color: #4299e1;
+  border-color: #22c55e;
 }
 
 .form-input::placeholder {
@@ -595,7 +595,7 @@ fetchSupportedCurrencies();
 }
 
 .max-btn {
-  background: #4299e1;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 4px;
@@ -646,7 +646,7 @@ fetchSupportedCurrencies();
 
 .submit-btn {
   width: 100%;
-  background: linear-gradient(135deg, #4299e1 0%, #48bb78 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #48bb78 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -659,7 +659,7 @@ fetchSupportedCurrencies();
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
 }
 
 .submit-btn:disabled {
@@ -739,12 +739,12 @@ fetchSupportedCurrencies();
 }
 
 .status-badge.pending {
-  background: rgba(66, 153, 225, 0.2);
-  color: #4299e1;
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
 }
 
 .primary-btn {
-  background: #4299e1;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 8px;
@@ -760,8 +760,8 @@ fetchSupportedCurrencies();
 
 .secondary-btn {
   background: transparent;
-  color: #4299e1;
-  border: 1px solid #4299e1;
+  color: #22c55e;
+  border: 1px solid #22c55e;
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
@@ -770,7 +770,7 @@ fetchSupportedCurrencies();
 }
 
 .secondary-btn:hover {
-  background: rgba(66, 153, 225, 0.1);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .empty-state {
@@ -798,7 +798,7 @@ fetchSupportedCurrencies();
   width: 48px;
   height: 48px;
   border: 4px solid #2d3748;
-  border-top-color: #4299e1;
+  border-top-color: #22c55e;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

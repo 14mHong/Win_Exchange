@@ -5,7 +5,7 @@ export const useThemeStore = defineStore('theme', () => {
   // State
   const isDark = ref(false)
   const colorScheme = ref('auto') // 'light', 'dark', 'auto'
-  const accentColor = ref('blue') // 'blue', 'green', 'purple', 'orange'
+  const accentColor = ref('green') // 'blue', 'green', 'purple', 'orange'
 
   // Getters
   const currentTheme = computed(() => {

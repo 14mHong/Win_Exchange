@@ -215,9 +215,9 @@ onMounted(() => {
 }
 
 .action-card:hover {
-  border-color: #4299e1;
+  border-color: #22c55e;
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(66, 153, 225, 0.2);
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.2);
 }
 
 .action-card.security:hover {
@@ -232,7 +232,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(66, 153, 225, 0.1);
+  background: rgba(34, 197, 94, 0.1);
   border-radius: 12px;
   flex-shrink: 0;
 }
@@ -259,7 +259,7 @@ onMounted(() => {
 
 .action-arrow {
   font-size: 2rem;
-  color: #4299e1;
+  color: #22c55e;
   font-weight: 300;
 }
 
@@ -305,7 +305,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(66, 153, 225, 0.1);
+  background: rgba(34, 197, 94, 0.1);
   border-radius: 8px;
   flex-shrink: 0;
 }

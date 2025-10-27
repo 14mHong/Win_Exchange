@@ -62,7 +62,7 @@
         </div>
         <div class="invite-stat-card">
           <div class="invite-stat-label">Used Codes</div>
-          <div class="invite-stat-value text-blue-400">{{ inviteStats.used_codes || 0 }}</div>
+          <div class="invite-stat-value text-green-400">{{ inviteStats.used_codes || 0 }}</div>
         </div>
         <div class="invite-stat-card">
           <div class="invite-stat-label">Expired Codes</div>
@@ -814,7 +814,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(66, 153, 225, 0.1);
+  background: rgba(34, 197, 94, 0.1);
   border-radius: 12px;
 }
 
@@ -870,7 +870,7 @@ onMounted(() => {
 
 .search-input:focus {
   outline: none;
-  border-color: #4299e1;
+  border-color: #22c55e;
 }
 
 .table-container {
@@ -912,7 +912,7 @@ onMounted(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4299e1 0%, #48bb78 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #48bb78 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -957,8 +957,8 @@ onMounted(() => {
 }
 
 .status-badge.active {
-  background: rgba(66, 153, 225, 0.2);
-  color: #4299e1;
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
 }
 
 .status-badge.inactive {
@@ -991,11 +991,11 @@ onMounted(() => {
 }
 
 .action-btn.view {
-  background: rgba(66, 153, 225, 0.2);
+  background: rgba(34, 197, 94, 0.2);
 }
 
 .action-btn.view:hover {
-  background: rgba(66, 153, 225, 0.3);
+  background: rgba(34, 197, 94, 0.3);
 }
 
 .action-btn.danger {
@@ -1024,8 +1024,8 @@ onMounted(() => {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid rgba(66, 153, 225, 0.2);
-  border-top-color: #4299e1;
+  border: 4px solid rgba(34, 197, 94, 0.2);
+  border-top-color: #22c55e;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 1rem;
@@ -1149,9 +1149,9 @@ onMounted(() => {
 
 .key-currency {
   padding: 0.375rem 0.75rem;
-  background: rgba(66, 153, 225, 0.2);
+  background: rgba(34, 197, 94, 0.2);
   border-radius: 4px;
-  color: #4299e1;
+  color: #22c55e;
   font-weight: 700;
 }
 
@@ -1188,7 +1188,7 @@ onMounted(() => {
 
 .copy-btn {
   padding: 0.375rem 0.75rem;
-  background: #4299e1;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 4px;
@@ -1294,7 +1294,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 0.75rem;
-  background: rgba(66, 153, 225, 0.05);
+  background: rgba(34, 197, 94, 0.05);
   border-radius: 6px;
   margin-bottom: 0.5rem;
 }
@@ -1302,7 +1302,7 @@ onMounted(() => {
 .wallet-currency,
 .address-currency {
   font-weight: 700;
-  color: #4299e1;
+  color: #22c55e;
 }
 
 .wallet-balance {
@@ -1396,7 +1396,7 @@ onMounted(() => {
 
 .form-input:focus {
   outline: none;
-  border-color: #4299e1;
+  border-color: #22c55e;
 }
 
 .form-hint {
@@ -1428,7 +1428,7 @@ onMounted(() => {
 
 .copy-all-btn {
   padding: 0.5rem 1rem;
-  background: #4299e1;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 6px;

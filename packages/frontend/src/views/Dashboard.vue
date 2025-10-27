@@ -41,9 +41,9 @@
         <div class="p-5">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+              <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
                 <svg
-                  class="w-6 h-6 text-blue-600 dark:text-blue-400"
+                  class="w-6 h-6 text-green-600 dark:text-green-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -152,7 +152,7 @@
         class="relative group bg-white dark:bg-dark-700 p-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg shadow hover:shadow-md transition-shadow"
       >
         <div class="flex items-center">
-          <span class="rounded-lg inline-flex p-2 bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-800">
+          <span class="rounded-lg inline-flex p-2 bg-green-50 dark:bg-green-900 text-green-600 dark:text-green-400 group-hover:bg-green-100 dark:group-hover:bg-green-800">
             <svg
               class="h-5 w-5"
               fill="none"
@@ -250,7 +250,7 @@
 
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
           <p class="mt-4 text-gray-500 dark:text-gray-400">Loading your balances...</p>
         </div>
 
@@ -294,8 +294,8 @@
               <tr v-for="wallet in wallets" :key="wallet.currency" class="hover:bg-gray-50 dark:hover:bg-dark-700">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                      <span class="text-blue-600 dark:text-blue-400 font-bold text-sm">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <span class="text-green-600 dark:text-green-400 font-bold text-sm">
                         {{ wallet.currency.substring(0, 2) }}
                       </span>
                     </div>
@@ -325,7 +325,7 @@
                   <div v-if="canDepositWithdraw(wallet.currency)">
                     <router-link
                       :to="`/wallet/deposit/${wallet.currency}`"
-                      class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3"
+                      class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 mr-3"
                     >
                       Deposit
                     </router-link>

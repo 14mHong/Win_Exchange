@@ -106,7 +106,7 @@
         <div class="mt-6 flex gap-3 justify-center">
           <router-link
             to="/wallet/deposit"
-            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
           >
             Make a Deposit
           </router-link>
@@ -479,7 +479,7 @@ export default {
     const getStatusClass = (status) => {
       const classes = {
         pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-        processing: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+        processing: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
         completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
         failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
         canceled: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'

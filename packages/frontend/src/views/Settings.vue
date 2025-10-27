@@ -656,7 +656,7 @@ onMounted(() => {
 .form-input:focus,
 .form-select:focus {
   outline: none;
-  border-color: #4299e1;
+  border-color: #22c55e;
 }
 
 .form-input:disabled {
@@ -672,7 +672,7 @@ onMounted(() => {
 
 .submit-btn {
   width: 100%;
-  background: linear-gradient(135deg, #4299e1 0%, #48bb78 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #48bb78 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -684,7 +684,7 @@ onMounted(() => {
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
 }
 
 .submit-btn:disabled {
@@ -798,7 +798,7 @@ onMounted(() => {
 }
 
 .session-item.current {
-  border-color: #4299e1;
+  border-color: #22c55e;
 }
 
 .session-icon {
@@ -808,7 +808,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(66, 153, 225, 0.1);
+  background: rgba(34, 197, 94, 0.1);
   border-radius: 8px;
 }
 
@@ -836,8 +836,8 @@ onMounted(() => {
 }
 
 .session-badge.current {
-  background: rgba(66, 153, 225, 0.2);
-  color: #4299e1;
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
 }
 
 .provider-badge {
@@ -865,7 +865,7 @@ onMounted(() => {
 
 .verify-btn {
   padding: 0.75rem 1.5rem;
-  background: #4299e1;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 8px;
@@ -962,13 +962,13 @@ onMounted(() => {
 }
 
 .modal-btn.primary {
-  background: linear-gradient(135deg, #4299e1 0%, #48bb78 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #48bb78 100%);
   color: white;
 }
 
 .modal-btn.primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
 }
 
 .modal-btn.primary:disabled {

@@ -86,7 +86,7 @@ const goBack = () => {
 
 /* Primary variant */
 .back-button.primary {
-  background: linear-gradient(135deg, #4299e1 0%, #48bb78 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #48bb78 100%);
   color: white;
   border: none;
 }
