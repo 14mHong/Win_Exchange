@@ -316,6 +316,7 @@ export default {
     ]
 
     const formatPrice = (price) => {
+      if (price == null || isNaN(price)) return '0.00'
       return new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -323,6 +324,7 @@ export default {
     }
 
     const formatVolume = (volume) => {
+      if (volume == null || isNaN(volume)) return '0'
       if (volume >= 1e9) {
         return (volume / 1e9).toFixed(1) + 'B'
       } else if (volume >= 1e6) {
