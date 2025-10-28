@@ -124,6 +124,79 @@
       </div>
     </div>
 
+    <!-- WIN Token Management -->
+    <div class="content-section mb-6">
+      <div class="section-header">
+        <h2 class="section-title">🪙 WIN Token Management</h2>
+        <button @click="refreshWinToken" class="generate-btn" :disabled="loadingWinToken">
+          🔄 Refresh
+        </button>
+      </div>
+
+      <div v-if="loadingWinToken" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading WIN token data...</p>
+      </div>
+
+      <div v-else-if="winTokenConfig" class="win-token-section">
+        <!-- Current Price Display -->
+        <div class="win-price-display">
+          <div class="price-label">Current Price</div>
+          <div class="price-value">${{ parseFloat(winTokenConfig.current_price).toFixed(8) }}</div>
+          <div class="price-info">
+            Base: ${{ parseFloat(winTokenConfig.base_price).toFixed(8) }} |
+            Min: ${{ parseFloat(winTokenConfig.min_price).toFixed(8) }} |
+            Max: {{ winTokenConfig.max_price ? '$' + parseFloat(winTokenConfig.max_price).toFixed(8) : 'Unlimited' }}
+          </div>
+        </div>
+
+        <!-- WIN Token Stats Grid -->
+        <div class="invite-stats-grid mt-4">
+          <div class="invite-stat-card">
+            <div class="invite-stat-label">Volatility</div>
+            <div class="invite-stat-value">{{ (parseFloat(winTokenConfig.volatility) * 100).toFixed(1) }}%</div>
+          </div>
+          <div class="invite-stat-card">
+            <div class="invite-stat-label">Trend Strength</div>
+            <div class="invite-stat-value">{{ (parseFloat(winTokenConfig.trend_strength) * 100).toFixed(1) }}%</div>
+          </div>
+          <div class="invite-stat-card">
+            <div class="invite-stat-label">Simulation</div>
+            <div class="invite-stat-value" :class="winTokenConfig.simulation_enabled ? 'text-green-400' : 'text-red-400'">
+              {{ winTokenConfig.simulation_enabled ? 'Enabled' : 'Disabled' }}
+            </div>
+          </div>
+          <div class="invite-stat-card">
+            <div class="invite-stat-label">Market Cap</div>
+            <div class="invite-stat-value">${{ formatLargeNumber(parseFloat(winTokenConfig.market_cap)) }}</div>
+          </div>
+        </div>
+
+        <!-- Update Price Form -->
+        <div class="win-price-form mt-4">
+          <h3 class="text-lg font-semibold text-white mb-3">Update Price</h3>
+          <div class="form-row">
+            <input
+              v-model="newWinPrice"
+              type="number"
+              step="0.00000001"
+              placeholder="Enter new price (e.g., 0.0001)"
+              class="price-input"
+            />
+            <input
+              v-model="priceUpdateReason"
+              type="text"
+              placeholder="Reason for price update (optional)"
+              class="reason-input"
+            />
+            <button @click="updateWinPrice" class="update-btn" :disabled="updatingPrice || !newWinPrice">
+              {{ updatingPrice ? 'Updating...' : 'Update Price' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Users Table -->
     <div class="content-section">
       <div class="section-header">
@@ -529,6 +602,11 @@ const generateForm = ref({
   notes: '',
   maxUses: 1
 });
+const winTokenConfig = ref(null);
+const loadingWinToken = ref(false);
+const newWinPrice = ref('');
+const priceUpdateReason = ref('');
+const updatingPrice = ref(false);
 
 // Computed
 const filteredUsers = computed(() => {
@@ -761,6 +839,61 @@ const closeDeleteModal = () => {
   deleteConfirmation.value = '';
 };
 
+// WIN Token Methods
+const fetchWinTokenConfig = async () => {
+  loadingWinToken.value = true;
+  try {
+    const response = await apiHelpers.get('/api/admin/win-token/config');
+    if (response.success) {
+      winTokenConfig.value = response.data;
+    }
+  } catch (err) {
+    console.error('Failed to fetch WIN token config:', err);
+    notificationStore.error('Error', 'Failed to load WIN token configuration');
+  } finally {
+    loadingWinToken.value = false;
+  }
+};
+
+const refreshWinToken = async () => {
+  await fetchWinTokenConfig();
+  notificationStore.success('Success', 'WIN token data refreshed');
+};
+
+const updateWinPrice = async () => {
+  if (!newWinPrice.value || isNaN(newWinPrice.value)) {
+    notificationStore.error('Invalid Input', 'Please enter a valid price');
+    return;
+  }
+
+  updatingPrice.value = true;
+  try {
+    const response = await apiHelpers.post('/api/admin/win-token/price', {
+      price: parseFloat(newWinPrice.value),
+      reason: priceUpdateReason.value || 'Manual price update from admin panel'
+    });
+
+    if (response.success) {
+      notificationStore.success('Success', `WIN token price updated to $${newWinPrice.value}`);
+      newWinPrice.value = '';
+      priceUpdateReason.value = '';
+      await fetchWinTokenConfig();
+    }
+  } catch (err) {
+    console.error('Failed to update WIN price:', err);
+    notificationStore.error('Error', err.message || 'Failed to update price');
+  } finally {
+    updatingPrice.value = false;
+  }
+};
+
+const formatLargeNumber = (num) => {
+  if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+  if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+  if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+  return num.toFixed(2);
+};
+
 // Check if user is admin
 const checkAdminAccess = () => {
   // This should be checked on the backend, but we can also check on frontend
@@ -776,6 +909,7 @@ onMounted(() => {
   fetchStats();
   fetchUsers();
   fetchInviteCodes();
+  fetchWinTokenConfig();
 });
 </script>
 
@@ -1632,6 +1766,103 @@ onMounted(() => {
   .action-btn {
     padding: 0.25rem 0.5rem;
     font-size: 0.688rem;
+  }
+}
+
+/* WIN Token Management Styles */
+.win-token-section {
+  padding: 1.5rem;
+  background: #0f1117;
+  border-radius: 8px;
+}
+
+.win-price-display {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.price-label {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.5rem;
+}
+
+.price-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.price-info {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.win-price-form {
+  padding: 1.5rem;
+  background: #1a1d29;
+  border: 1px solid #2d3748;
+  border-radius: 8px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.price-input,
+.reason-input {
+  padding: 0.75rem;
+  background: #0f1117;
+  border: 1px solid #2d3748;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.938rem;
+}
+
+.price-input:focus,
+.reason-input:focus {
+  outline: none;
+  border-color: #22c55e;
+}
+
+.update-btn {
+  padding: 0.75rem 1.5rem;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.update-btn:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.update-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .price-value {
+    font-size: 1.75rem;
   }
 }
 </style>
