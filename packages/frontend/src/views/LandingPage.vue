@@ -502,9 +502,10 @@ export default {
           borderColor: '#cccccc',
           autoScale: true,
           scaleMargins: {
-            top: 0.1,
-            bottom: 0.1
-          }
+            top: 0.2,
+            bottom: 0.2
+          },
+          entireTextOnly: false
         },
         timeScale: {
           borderColor: '#cccccc',
@@ -541,7 +542,27 @@ export default {
       })).sort((a, b) => a.time - b.time) // Ensure chronological order
 
       candlestickSeries.setData(formattedData)
+
+      // Fit content and ensure all price ranges are visible
       chart.timeScale().fitContent()
+
+      // Force the price scale to show the full range
+      if (formattedData.length > 0) {
+        const allPrices = formattedData.flatMap(d => [d.high, d.low])
+        const minPrice = Math.min(...allPrices)
+        const maxPrice = Math.max(...allPrices)
+        const priceRange = maxPrice - minPrice
+        const padding = priceRange * 0.1 // 10% padding
+
+        candlestickSeries.applyOptions({
+          autoscaleInfoProvider: () => ({
+            priceRange: {
+              minValue: minPrice - padding,
+              maxValue: maxPrice + padding
+            }
+          })
+        })
+      }
 
       // Handle resize
       const resizeHandler = () => {
@@ -588,6 +609,27 @@ export default {
 
         // Update the series data smoothly
         winChartWidget.value.series.setData(formattedData)
+
+        // Ensure the chart shows the full price range
+        if (formattedData.length > 0) {
+          const allPrices = formattedData.flatMap(d => [d.high, d.low])
+          const minPrice = Math.min(...allPrices)
+          const maxPrice = Math.max(...allPrices)
+          const priceRange = maxPrice - minPrice
+          const padding = priceRange * 0.1 // 10% padding
+
+          winChartWidget.value.series.applyOptions({
+            autoscaleInfoProvider: () => ({
+              priceRange: {
+                minValue: minPrice - padding,
+                maxValue: maxPrice + padding
+              }
+            })
+          })
+
+          // Fit the time scale to show all data
+          winChartWidget.value.chart.timeScale().fitContent()
+        }
       } catch (error) {
         console.error('Error updating WIN chart data:', error)
       }
