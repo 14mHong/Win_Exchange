@@ -110,10 +110,10 @@ class WinPriceSimulator {
 
       const randomShock = this.boxMullerRandom();
 
-      // Scale drift and volatility appropriately for 1-second intervals
-      // Make movements more visible by using daily scaling instead of yearly
-      const drift = (trendStrength / 365) * dt; // Convert annual to daily then to per-second
-      const diffusion = (volatility / Math.sqrt(365)) * Math.sqrt(dt) * randomShock; // Scale volatility
+      // Scale drift and volatility for visible movements
+      // Use larger scaling factors to make price changes noticeable
+      const drift = trendStrength * dt * 10; // Amplify drift for visibility
+      const diffusion = volatility * Math.sqrt(dt) * randomShock * 3; // Amplify volatility 3x
 
       // Calculate percentage change
       const percentChange = drift + diffusion;
@@ -121,9 +121,9 @@ class WinPriceSimulator {
       // Apply to current price
       let newPrice = currentPrice * (1 + percentChange);
 
-      // Add occasional larger jumps to simulate market events (5% chance)
-      if (Math.random() < 0.05) {
-        const jumpSize = (Math.random() - 0.5) * 0.01; // ±0.5% jump
+      // Add occasional larger jumps to simulate market events (10% chance)
+      if (Math.random() < 0.1) {
+        const jumpSize = (Math.random() - 0.5) * 0.02; // ±1% jump
         newPrice = newPrice * (1 + jumpSize);
       }
 
