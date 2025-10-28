@@ -574,8 +574,18 @@ export default {
       window.addEventListener('resize', resizeHandler)
 
       // Store chart and series reference with cleanup
-      if (winChartWidget.value && winChartWidget.value.chart) {
-        winChartWidget.value.chart.remove()
+      if (winChartWidget.value) {
+        // Clean up old chart properly
+        if (winChartWidget.value.cleanup) {
+          winChartWidget.value.cleanup()
+        }
+        if (winChartWidget.value.chart) {
+          try {
+            winChartWidget.value.chart.remove()
+          } catch (e) {
+            console.warn('Error removing old chart:', e)
+          }
+        }
       }
       winChartWidget.value = {
         chart,
@@ -587,7 +597,16 @@ export default {
     // Update WIN chart data without recreating the chart
     const updateWinChartData = async () => {
       try {
-        if (selectedSymbol.value !== 'WIN' || !winChartWidget.value?.series) {
+        if (selectedSymbol.value !== 'WIN' || !winChartWidget.value?.series || !winChartWidget.value?.chart) {
+          return
+        }
+
+        // Safety check: ensure chart hasn't been disposed
+        try {
+          // Test if chart is still valid by checking its options
+          winChartWidget.value.chart.options()
+        } catch (e) {
+          console.warn('Chart has been disposed, skipping update')
           return
         }
 
@@ -670,8 +689,18 @@ export default {
       onUnmounted(() => {
         clearInterval(marketInterval)
         clearInterval(chartRefreshInterval)
-        if (winChartWidget.value && winChartWidget.value.cleanup) {
-          winChartWidget.value.cleanup()
+        if (winChartWidget.value) {
+          if (winChartWidget.value.cleanup) {
+            winChartWidget.value.cleanup()
+          }
+          if (winChartWidget.value.chart) {
+            try {
+              winChartWidget.value.chart.remove()
+            } catch (e) {
+              console.warn('Error removing chart on unmount:', e)
+            }
+          }
+          winChartWidget.value = null
         }
       })
     })
