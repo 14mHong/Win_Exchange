@@ -85,10 +85,10 @@
               <div class="flex justify-between">
                 <span class="text-sm text-gray-500">24h Change</span>
                 <span
-                  :class="token.change24h >= 0 ? 'text-green-600' : 'text-red-600'"
+                  :class="(token.change24h || 0) >= 0 ? 'text-green-600' : 'text-red-600'"
                   class="font-semibold"
                 >
-                  {{ token.change24h >= 0 ? '+' : '' }}{{ token.change24h.toFixed(2) }}%
+                  {{ (token.change24h || 0) >= 0 ? '+' : '' }}{{ (token.change24h || 0).toFixed(2) }}%
                 </span>
               </div>
               <div class="flex justify-between">
