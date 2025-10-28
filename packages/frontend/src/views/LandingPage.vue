@@ -316,10 +316,10 @@ export default {
     ]
 
     const formatPrice = (price) => {
-      if (price == null || isNaN(price)) return '0.00'
+      if (price == null || isNaN(price)) return '0.0000'
       return new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 4
       }).format(price)
     }
 
