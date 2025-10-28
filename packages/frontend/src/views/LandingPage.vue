@@ -110,29 +110,29 @@
         </div>
 
         <!-- Featured Chart -->
-        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
+            <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
               {{ marketData.find(t => t.symbol === selectedSymbol)?.name || 'Bitcoin' }}/USDT Price Chart
             </h3>
-            <div class="flex items-center gap-4">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
               <!-- Token Selector -->
               <select
                 v-model="selectedSymbol"
-                class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-medium"
+                class="px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg font-medium text-sm"
               >
                 <option v-for="token in marketData" :key="token.symbol" :value="token.symbol">
                   {{ token.symbol }}
                 </option>
               </select>
               <!-- Time Range Selector (only for WIN token) -->
-              <div v-if="selectedSymbol === 'WIN'" class="flex gap-1">
+              <div v-if="selectedSymbol === 'WIN'" class="flex gap-1 overflow-x-auto">
                 <button
                   v-for="range in timeRanges"
                   :key="range.value"
                   @click="selectedTimeRange = range.value"
                   :class="[
-                    'px-3 py-1 text-sm font-medium rounded transition-colors',
+                    'px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded transition-colors whitespace-nowrap flex-shrink-0',
                     selectedTimeRange === range.value
                       ? 'bg-green-600 text-white'
                       : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
@@ -146,7 +146,7 @@
           <div class="relative">
             <div
               ref="chartContainer"
-              class="h-96"
+              class="h-64 sm:h-80 md:h-96"
             >
               <!-- TradingView Widget -->
               <div class="tradingview-widget-container" style="height:100%;width:100%">
