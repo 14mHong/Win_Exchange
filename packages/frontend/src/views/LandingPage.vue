@@ -502,17 +502,31 @@ export default {
           borderColor: '#cccccc',
           autoScale: true,
           scaleMargins: {
-            top: 0.2,
-            bottom: 0.2
+            top: 0.1,
+            bottom: 0.1
           },
-          entireTextOnly: false
+          entireTextOnly: false,
+          visible: true
         },
         timeScale: {
           borderColor: '#cccccc',
           timeVisible: true,
           secondsVisible: false,
           barSpacing: 12,
-          minBarSpacing: 8
+          minBarSpacing: 8,
+          rightOffset: 5,
+          lockVisibleTimeRangeOnResize: true
+        },
+        handleScroll: {
+          mouseWheel: true,
+          pressedMouseMove: true,
+          horzTouchDrag: true,
+          vertTouchDrag: true
+        },
+        handleScale: {
+          axisPressedMouseMove: true,
+          mouseWheel: true,
+          pinch: true
         }
       })
 
