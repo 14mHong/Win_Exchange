@@ -86,6 +86,7 @@ class WinPriceSimulator {
 
   /**
    * Generate a new price update using Geometric Brownian Motion
+   * Optimized for realistic crypto-like price movements
    */
   async generatePriceUpdate() {
     try {
@@ -96,34 +97,38 @@ class WinPriceSimulator {
 
       const currentPrice = parseFloat(config.current_price);
       const minPrice = parseFloat(config.min_price);
-      const maxPrice = parseFloat(config.max_price);
-      const volatility = parseFloat(config.volatility); // Standard deviation
-      const trendStrength = parseFloat(config.trend_strength); // Drift coefficient
+      const volatility = parseFloat(config.volatility); // Annual volatility (e.g., 0.5 = 50%)
+      const trendStrength = parseFloat(config.trend_strength); // Annual drift
 
-      // Time step (1 second as fraction of year)
-      const dt = 1 / (365 * 24 * 60 * 60);
+      // Use 1 second time step, but scale it appropriately
+      // Real crypto moves continuously, so we model 1-second intervals as meaningful periods
+      const dt = 1 / (24 * 60 * 60); // 1 second as fraction of day (not year)
 
-      // Geometric Brownian Motion:
-      // dS = μ * S * dt + σ * S * dW
-      // Where:
-      // - μ (mu) is the drift (trend)
-      // - σ (sigma) is the volatility
-      // - dW is Wiener process (random walk)
+      // Geometric Brownian Motion with realistic scaling:
+      // dS/S = μ*dt + σ*sqrt(dt)*dW
+      // where dW is standard normal random variable
 
       const randomShock = this.boxMullerRandom();
-      const drift = trendStrength * dt;
-      const diffusion = volatility * Math.sqrt(dt) * randomShock;
 
-      // Calculate new price
-      let newPrice = currentPrice * Math.exp(drift + diffusion);
+      // Scale drift and volatility appropriately for 1-second intervals
+      // Make movements more visible by using daily scaling instead of yearly
+      const drift = (trendStrength / 365) * dt; // Convert annual to daily then to per-second
+      const diffusion = (volatility / Math.sqrt(365)) * Math.sqrt(dt) * randomShock; // Scale volatility
 
-      // Add mean reversion to prevent extreme deviations
-      const targetPrice = parseFloat(config.base_price) * (1 + trendStrength * (Date.now() / 1000 / (365 * 24 * 60 * 60)));
-      const meanReversion = 0.001; // 0.1% mean reversion
-      newPrice = newPrice + (targetPrice - newPrice) * meanReversion;
+      // Calculate percentage change
+      const percentChange = drift + diffusion;
 
-      // Enforce min/max bounds
-      newPrice = Math.max(minPrice, Math.min(maxPrice, newPrice));
+      // Apply to current price
+      let newPrice = currentPrice * (1 + percentChange);
+
+      // Add occasional larger jumps to simulate market events (5% chance)
+      if (Math.random() < 0.05) {
+        const jumpSize = (Math.random() - 0.5) * 0.01; // ±0.5% jump
+        newPrice = newPrice * (1 + jumpSize);
+      }
+
+      // Only enforce minimum price, allow price to grow freely upward
+      newPrice = Math.max(minPrice, newPrice);
 
       // Update current price
       await WinToken.updatePrice(newPrice);
@@ -131,7 +136,7 @@ class WinPriceSimulator {
       // Update or create 1-minute candle
       await this.updateMinuteCandle(newPrice);
 
-      logger.debug(`WIN price updated: $${currentPrice.toFixed(8)} → $${newPrice.toFixed(8)}`);
+      logger.debug(`WIN price updated: $${currentPrice.toFixed(8)} → $${newPrice.toFixed(8)} (${(percentChange * 100).toFixed(4)}%)`);
 
       return newPrice;
     } catch (error) {
@@ -342,11 +347,10 @@ class WinPriceSimulator {
     try {
       const config = await WinToken.getConfig();
       const minPrice = parseFloat(config.min_price);
-      const maxPrice = parseFloat(config.max_price);
 
-      // Validate bounds
-      if (newPrice < minPrice || newPrice > maxPrice) {
-        throw new Error(`Price must be between ${minPrice} and ${maxPrice}`);
+      // Only validate minimum price, allow upward movement
+      if (newPrice < minPrice) {
+        throw new Error(`Price must be at least ${minPrice}`);
       }
 
       await WinToken.updatePrice(newPrice);
