@@ -310,9 +310,9 @@ export default {
       { label: '30M', value: '30m', timeframe: '30m', limit: 60 },
       { label: '1H', value: '1h', timeframe: '1h', limit: 60 },
       { label: '4H', value: '4h', timeframe: '4h', limit: 48 },
-      { label: '1D', value: '1d', timeframe: '1h', limit: 24 },
-      { label: '1W', value: '1w', timeframe: '4h', limit: 42 },
-      { label: '1M', value: '1m', timeframe: '1d', limit: 30 }
+      { label: '1D', value: '1d', timeframe: '1d', limit: 1 },      // 1 day candle
+      { label: '1W', value: '1w', timeframe: '1d', limit: 7 },      // 7 days of daily candles
+      { label: '1M', value: '1m', timeframe: '1d', limit: 30 }      // 30 days of daily candles
     ]
 
     const formatPrice = (price) => {
