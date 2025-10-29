@@ -557,8 +557,30 @@ export default {
 
       candlestickSeries.setData(formattedData)
 
-      // Fit content to show all candles
+      // Fit content to show all candles initially
       chart.timeScale().fitContent()
+
+      // Track if user has manually interacted with the chart
+      let userHasInteracted = false
+
+      // Listen for user interactions to disable autoscale
+      const disableAutoscale = () => {
+        if (!userHasInteracted) {
+          userHasInteracted = true
+          // Disable autoscale so user's zoom/pan is preserved
+          chart.applyOptions({
+            rightPriceScale: {
+              autoScale: false
+            }
+          })
+        }
+      }
+
+      // Subscribe to visible time range changes (pan/zoom)
+      chart.timeScale().subscribeVisibleTimeRangeChange(disableAutoscale)
+
+      // Subscribe to visible logical range changes (zoom)
+      chart.timeScale().subscribeVisibleLogicalRangeChange(disableAutoscale)
 
       // Handle resize
       const resizeHandler = () => {
@@ -586,7 +608,12 @@ export default {
       winChartWidget.value = {
         chart,
         series: candlestickSeries,
-        cleanup: () => window.removeEventListener('resize', resizeHandler)
+        userHasInteracted: false,
+        cleanup: () => {
+          window.removeEventListener('resize', resizeHandler)
+          chart.timeScale().unsubscribeVisibleTimeRangeChange(disableAutoscale)
+          chart.timeScale().unsubscribeVisibleLogicalRangeChange(disableAutoscale)
+        }
       }
     }
 
