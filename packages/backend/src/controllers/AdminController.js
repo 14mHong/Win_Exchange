@@ -689,6 +689,63 @@ class AdminController {
       });
     }
   }
+
+  /**
+   * Get blockchain monitoring service status
+   * Useful for debugging deposit detection issues
+   */
+  static async getBlockchainMonitorStatus(req, res) {
+    try {
+      const blockchainMonitor = require('../services/BlockchainMonitorService');
+      const DepositAddress = require('../models/DepositAddress');
+
+      // Get monitoring status
+      const status = {
+        is_monitoring: blockchainMonitor.isMonitoring,
+        ethereum: {
+          provider_configured: !!blockchainMonitor.providers.ETH,
+          is_testnet: blockchainMonitor.isTestnet,
+          network_string: blockchainMonitor.getNetworkString(),
+          rpc_url: process.env.ETHEREUM_RPC_URL ? process.env.ETHEREUM_RPC_URL.substring(0, 50) + '...' : 'NOT SET'
+        },
+        deposit_addresses: {}
+      };
+
+      // Get current block if provider exists
+      if (blockchainMonitor.providers.ETH) {
+        try {
+          status.ethereum.current_block = await blockchainMonitor.providers.ETH.getBlockNumber();
+        } catch (error) {
+          status.ethereum.block_error = error.message;
+        }
+      }
+
+      // Count deposit addresses for each currency
+      const currencies = ['ETH', 'USDT', 'USDC', 'BTC', 'LTC'];
+      for (const currency of currencies) {
+        try {
+          const addresses = await DepositAddress.findByCurrency(currency);
+          status.deposit_addresses[currency] = {
+            count: addresses.length,
+            sample: addresses.length > 0 ? addresses[0].address : null
+          };
+        } catch (error) {
+          status.deposit_addresses[currency] = { error: error.message };
+        }
+      }
+
+      res.json({
+        success: true,
+        data: status
+      });
+    } catch (error) {
+      logger.error('Get blockchain monitor status error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get blockchain monitor status'
+      });
+    }
+  }
 }
 
 module.exports = AdminController;

@@ -42,4 +42,7 @@ router.post('/invite-codes/generate', AdminController.generateInviteCodes);
 router.get('/invite-codes', AdminController.getAllInviteCodes);
 router.post('/invite-codes/:code/deactivate', AdminController.deactivateInviteCode);
 
+// Blockchain monitoring status
+router.get('/blockchain/monitor-status', AdminController.getBlockchainMonitorStatus);
+
 module.exports = router;
