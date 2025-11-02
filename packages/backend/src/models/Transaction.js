@@ -42,16 +42,16 @@ class Transaction {
     const queryText = `
       INSERT INTO transactions (
         id, user_id, wallet_id, type, currency, amount, fee,
-        status, tx_hash, block_number, from_address, to_address,
+        status, tx_hash, block_number,
         confirmations, external_id, notes
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *
     `;
 
     const result = await query(queryText, [
       id, user_id, wallet_id, type, currency, amount, fee,
-      status, tx_hash, block_number, from_address, to_address,
+      status, tx_hash, block_number,
       confirmations, external_id, notes
     ]);
 
