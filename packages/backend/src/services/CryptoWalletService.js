@@ -142,13 +142,18 @@ class CryptoWalletService {
     try {
       const hdNode = ethers.HDNodeWallet.fromPhrase(this.masterSeed, undefined, path);
 
+      // Ethereum addresses work on both mainnet and testnet
+      // The network field is just informational - monitoring uses the configured RPC URL
+      const isTestnet = process.env.ETHEREUM_RPC_URL && process.env.ETHEREUM_RPC_URL.includes('sepolia');
+      const network = isTestnet ? 'ETH Testnet' : 'Ethereum Mainnet';
+
       return {
         userId,
         currency,
         address: hdNode.address,
         privateKey: hdNode.privateKey,
         derivationPath: path,
-        network: 'Ethereum Mainnet',
+        network,
         provider: 'ethereum'
       };
     } catch (error) {

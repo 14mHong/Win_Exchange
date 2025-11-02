@@ -104,21 +104,44 @@ class DepositAddress {
    * Get all addresses for a specific currency
    * Used for blockchain monitoring
    *
+   * For Ethereum-based currencies (ETH, USDT, USDC, BNB), addresses work on both
+   * mainnet and testnet, so we don't filter by network - we monitor whatever
+   * RPC endpoint is configured.
+   *
    * @param {string} currency
-   * @param {string} network - e.g., 'Bitcoin Mainnet', 'Ethereum Mainnet'
+   * @param {string} network - Optional, only used for Bitcoin-like currencies
    * @returns {Array} Deposit addresses
    */
-  static async findByCurrency(currency, network) {
-    const query = `
-      SELECT da.*, u.email
-      FROM deposit_addresses da
-      JOIN users u ON da.user_id = u.id
-      WHERE da.currency = $1 AND da.network = $2
-      ORDER BY da.user_id
-    `;
+  static async findByCurrency(currency, network = null) {
+    // Ethereum addresses work on both mainnet and testnet
+    const ETH_BASED = ['ETH', 'USDT', 'USDC', 'BNB'];
+
+    let query, params;
+
+    if (ETH_BASED.includes(currency)) {
+      // For ETH-based, ignore network and return all addresses for this currency
+      query = `
+        SELECT da.*, u.email
+        FROM deposit_addresses da
+        JOIN users u ON da.user_id = u.id
+        WHERE da.currency = $1
+        ORDER BY da.user_id
+      `;
+      params = [currency];
+    } else {
+      // For other currencies (BTC, LTC), filter by network
+      query = `
+        SELECT da.*, u.email
+        FROM deposit_addresses da
+        JOIN users u ON da.user_id = u.id
+        WHERE da.currency = $1 AND da.network = $2
+        ORDER BY da.user_id
+      `;
+      params = [currency, network];
+    }
 
     try {
-      const result = await pool.query(query, [currency, network]);
+      const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error finding addresses by currency:', error);
