@@ -97,6 +97,21 @@ class WalletController {
       let depositAddr = await DepositAddress.findByUserAndCurrency(req.user.id, currencyUpper);
 
       if (depositAddr) {
+        // Address already exists, but ensure wallet exists too
+        let wallet = await Wallet.findByUserAndCurrency(req.user.id, currencyUpper);
+        if (!wallet) {
+          wallet = await Wallet.create({
+            user_id: req.user.id,
+            currency: currencyUpper,
+            balance: 0
+          });
+          logger.info('Auto-created missing wallet for existing deposit address', {
+            userId: req.user.id,
+            currency: currencyUpper,
+            walletId: wallet.id
+          });
+        }
+
         // Return existing address
         return res.json({
           success: true,
@@ -121,6 +136,21 @@ class WalletController {
             derivation_path: ethAddr.derivation_path,
             network: ethAddr.network
           });
+
+          // Ensure wallet exists for this ERC-20 token
+          let wallet = await Wallet.findByUserAndCurrency(req.user.id, currencyUpper);
+          if (!wallet) {
+            wallet = await Wallet.create({
+              user_id: req.user.id,
+              currency: currencyUpper,
+              balance: 0
+            });
+            logger.info('Auto-created wallet for ERC-20 token', {
+              userId: req.user.id,
+              currency: currencyUpper,
+              walletId: wallet.id
+            });
+          }
 
           logger.logUserAction(req.user.id, 'DEPOSIT_ADDRESS_GENERATED', {
             currency: currencyUpper,
@@ -178,6 +208,38 @@ class WalletController {
             address: addressData.address,
             derivation_path: addressData.derivationPath,
             network: addressData.network
+          });
+        }
+      }
+
+      // Ensure wallet exists for this currency
+      // This is critical for deposit monitoring - it needs a wallet to credit deposits to
+      let wallet = await Wallet.findByUserAndCurrency(req.user.id, currencyUpper);
+      if (!wallet) {
+        wallet = await Wallet.create({
+          user_id: req.user.id,
+          currency: currencyUpper,
+          balance: 0
+        });
+        logger.info('Auto-created wallet for deposit currency', {
+          userId: req.user.id,
+          currency: currencyUpper,
+          walletId: wallet.id
+        });
+      }
+
+      // Also ensure ETH wallet exists for ERC-20 tokens (deposits could come as ETH)
+      if (ERC20_TOKENS.includes(currencyUpper)) {
+        let ethWallet = await Wallet.findByUserAndCurrency(req.user.id, 'ETH');
+        if (!ethWallet) {
+          ethWallet = await Wallet.create({
+            user_id: req.user.id,
+            currency: 'ETH',
+            balance: 0
+          });
+          logger.info('Auto-created ETH wallet for ERC-20 token', {
+            userId: req.user.id,
+            walletId: ethWallet.id
           });
         }
       }
