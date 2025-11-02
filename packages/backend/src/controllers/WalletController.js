@@ -1,6 +1,7 @@
 const WalletService = require('../services/WalletService');
 const CryptoWalletService = require('../services/CryptoWalletService');
 const DepositAddress = require('../models/DepositAddress');
+const Wallet = require('../models/Wallet');
 const logger = require('../config/logger');
 const Joi = require('joi');
 
