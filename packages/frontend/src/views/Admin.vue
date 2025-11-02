@@ -197,6 +197,78 @@
       </div>
     </div>
 
+    <!-- Blockchain Monitor Status -->
+    <div class="content-section mb-6">
+      <div class="section-header">
+        <h2 class="section-title">⛓️ Blockchain Monitor Status</h2>
+        <button @click="refreshMonitorStatus" class="generate-btn" :disabled="loadingMonitorStatus">
+          🔄 Refresh
+        </button>
+      </div>
+
+      <div v-if="loadingMonitorStatus" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading monitor status...</p>
+      </div>
+
+      <div v-else-if="monitorStatus" class="win-token-section">
+        <!-- Monitoring Status -->
+        <div class="monitor-header mb-6">
+          <div class="monitor-status-badge" :class="monitorStatus.is_monitoring ? 'status-active' : 'status-inactive'">
+            {{ monitorStatus.is_monitoring ? '✓ Monitoring Active' : '✗ Monitoring Inactive' }}
+          </div>
+        </div>
+
+        <!-- Ethereum Config -->
+        <div v-if="monitorStatus.ethereum" class="mb-6">
+          <h3 class="text-lg font-semibold text-white mb-3">Ethereum Configuration</h3>
+          <div class="config-grid">
+            <div class="config-item">
+              <span class="config-label">Provider Configured:</span>
+              <span class="config-value" :class="monitorStatus.ethereum.provider_configured ? 'text-green-400' : 'text-red-400'">
+                {{ monitorStatus.ethereum.provider_configured ? 'Yes' : 'No' }}
+              </span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">Network Type:</span>
+              <span class="config-value">{{ monitorStatus.ethereum.is_testnet ? 'Testnet (Sepolia)' : 'Mainnet' }}</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">Network String:</span>
+              <span class="config-value">{{ monitorStatus.ethereum.network_string }}</span>
+            </div>
+            <div class="config-item">
+              <span class="config-label">Current Block:</span>
+              <span class="config-value">{{ monitorStatus.ethereum.current_block || 'N/A' }}</span>
+            </div>
+            <div class="config-item config-item-full">
+              <span class="config-label">RPC URL:</span>
+              <span class="config-value text-sm">{{ monitorStatus.ethereum.rpc_url }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deposit Addresses -->
+        <div v-if="monitorStatus.deposit_addresses">
+          <h3 class="text-lg font-semibold text-white mb-3">Deposit Addresses</h3>
+          <div class="address-grid">
+            <div v-for="(data, currency) in monitorStatus.deposit_addresses" :key="currency" class="address-card">
+              <div class="address-currency">{{ currency }}</div>
+              <div v-if="data.error" class="address-error">Error: {{ data.error }}</div>
+              <div v-else>
+                <div class="address-count">{{ data.count }} address(es)</div>
+                <div v-if="data.sample" class="address-sample">{{ data.sample.substring(0, 10) }}...{{ data.sample.substring(data.sample.length - 8) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="error-state">
+        <p>Failed to load blockchain monitor status</p>
+      </div>
+    </div>
+
     <!-- Users Table -->
     <div class="content-section">
       <div class="section-header">
@@ -608,6 +680,10 @@ const newWinPrice = ref('');
 const priceUpdateReason = ref('');
 const updatingPrice = ref(false);
 
+// Blockchain Monitor Status
+const monitorStatus = ref(null);
+const loadingMonitorStatus = ref(false);
+
 // Computed
 const filteredUsers = computed(() => {
   if (!searchQuery.value) return users.value;
@@ -894,6 +970,27 @@ const formatLargeNumber = (num) => {
   return num.toFixed(2);
 };
 
+// Blockchain Monitor Status Methods
+const fetchMonitorStatus = async () => {
+  loadingMonitorStatus.value = true;
+  try {
+    const response = await apiHelpers.get('/api/admin/blockchain/monitor-status');
+    if (response.success) {
+      monitorStatus.value = response.data;
+    }
+  } catch (err) {
+    console.error('Failed to fetch monitor status:', err);
+    notificationStore.error('Error', err.message || 'Failed to fetch blockchain monitor status');
+  } finally {
+    loadingMonitorStatus.value = false;
+  }
+};
+
+const refreshMonitorStatus = async () => {
+  await fetchMonitorStatus();
+  notificationStore.success('Refreshed', 'Blockchain monitor status updated');
+};
+
 // Check if user is admin
 const checkAdminAccess = () => {
   // This should be checked on the backend, but we can also check on frontend
@@ -910,6 +1007,7 @@ onMounted(() => {
   fetchUsers();
   fetchInviteCodes();
   fetchWinTokenConfig();
+  fetchMonitorStatus();
 });
 </script>
 
@@ -1863,6 +1961,115 @@ onMounted(() => {
 
   .price-value {
     font-size: 1.75rem;
+  }
+}
+
+/* Blockchain Monitor Styles */
+.monitor-header {
+  text-align: center;
+}
+
+.monitor-status-badge {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.status-active {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+}
+
+.status-inactive {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  background: #1a1d29;
+  border-radius: 8px;
+  border: 1px solid #2d3748;
+}
+
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #0f1117;
+  border-radius: 6px;
+}
+
+.config-item-full {
+  grid-column: 1 / -1;
+}
+
+.config-label {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.config-value {
+  font-size: 0.875rem;
+  color: white;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.address-card {
+  padding: 1rem;
+  background: #1a1d29;
+  border: 1px solid #2d3748;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.address-currency {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #22c55e;
+  margin-bottom: 0.5rem;
+}
+
+.address-count {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.address-sample {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-family: 'JetBrains Mono', monospace;
+  word-break: break-all;
+}
+
+.address-error {
+  font-size: 0.875rem;
+  color: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .address-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
