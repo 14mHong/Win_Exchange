@@ -483,12 +483,10 @@ class BlockchainMonitorService {
         amount,
         status: 'processing',
         tx_hash: txData.hash,
-        from_address: txData.from,
-        to_address: txData.to || wallet.deposit_address,
         block_number: txData.blockNumber,
         confirmations: 0,
         external_id: `deposit_${txData.hash}`,
-        notes: `Blockchain deposit - ${currency}`
+        notes: `Blockchain deposit - ${currency} from ${txData.from || 'unknown'}`
       };
 
       logger.debug(`[processDeposit] Creating transaction with payload:`, txPayload);
