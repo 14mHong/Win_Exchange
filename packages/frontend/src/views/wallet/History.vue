@@ -124,22 +124,22 @@
         <div
           v-for="transaction in transactions"
           :key="transaction.id"
-          class="p-6 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors cursor-pointer"
+          class="p-4 md:p-6 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors cursor-pointer"
           @click="showTransactionDetails(transaction)"
         >
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <!-- Left: Type, Currency, and Details -->
-            <div class="flex items-center space-x-4 flex-1">
+            <div class="flex items-center space-x-3 sm:space-x-4 flex-1">
               <!-- Icon -->
               <div
                 :class="[
-                  'flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center',
+                  'flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center',
                   transaction.type === 'deposit' ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'
                 ]"
               >
                 <svg
                   v-if="transaction.type === 'deposit'"
-                  class="w-6 h-6 text-green-600 dark:text-green-400"
+                  class="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -153,7 +153,7 @@
                 </svg>
                 <svg
                   v-else
-                  class="w-6 h-6 text-red-600 dark:text-red-400"
+                  class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -169,38 +169,38 @@
 
               <!-- Transaction Info -->
               <div class="flex-1 min-w-0">
-                <div class="flex items-center space-x-2">
-                  <h3 class="text-base font-semibold text-gray-900 dark:text-white capitalize">
+                <div class="flex items-center flex-wrap gap-2">
+                  <h3 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-white capitalize">
                     {{ transaction.type }}
                   </h3>
                   <span
                     :class="[
-                      'px-2 py-1 text-xs font-medium rounded-full',
+                      'px-2 py-0.5 text-xs font-medium rounded-full whitespace-nowrap',
                       getStatusClass(transaction.status)
                     ]"
                   >
                     {{ transaction.status }}
                   </span>
                 </div>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                   {{ formatDate(transaction.created_at) }}
                 </p>
-                <p v-if="transaction.tx_hash" class="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono truncate max-w-md">
+                <p v-if="transaction.tx_hash" class="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono truncate max-w-[200px] sm:max-w-md">
                   TX: {{ transaction.tx_hash }}
                 </p>
               </div>
             </div>
 
             <!-- Right: Amount and Currency -->
-            <div class="text-right ml-4">
+            <div class="text-right sm:ml-4 pl-13 sm:pl-0">
               <div
                 :class="[
-                  'text-lg font-bold',
+                  'text-base sm:text-lg font-bold',
                   transaction.type === 'deposit' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                 ]"
               >
                 {{ transaction.type === 'deposit' ? '+' : '-' }}{{ formatAmount(Math.abs(transaction.amount)) }}
-                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ transaction.currency }}</span>
+                <span class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{{ transaction.currency }}</span>
               </div>
               <p v-if="transaction.fee > 0" class="text-xs text-gray-500 dark:text-gray-500 mt-1">
                 Fee: {{ formatAmount(transaction.fee) }} {{ transaction.currency }}
@@ -214,9 +214,9 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="!loading && transactions.length > 0" class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-        <div class="flex items-center justify-between">
-          <div class="text-sm text-gray-600 dark:text-gray-400">
+      <div v-if="!loading && transactions.length > 0" class="px-4 md:px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             Showing {{ transactions.length }} of {{ totalTransactions }} transactions
           </div>
           <div class="flex space-x-2">
@@ -224,7 +224,7 @@
               @click="previousPage"
               :disabled="currentPage === 1"
               :class="[
-                'px-4 py-2 rounded-lg font-medium transition-colors',
+                'px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                 currentPage === 1
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800'
                   : 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300'
@@ -236,7 +236,7 @@
               @click="nextPage"
               :disabled="transactions.length < pageSize"
               :class="[
-                'px-4 py-2 rounded-lg font-medium transition-colors',
+                'px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                 transactions.length < pageSize
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800'
                   : 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300'
@@ -252,25 +252,25 @@
     <!-- Transaction Details Modal -->
     <div
       v-if="selectedTransaction"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50"
       @click.self="selectedTransaction = null"
     >
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Transaction Details</h2>
+            <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Transaction Details</h2>
             <button
               @click="selectedTransaction = null"
               class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
         </div>
 
-        <div class="p-6 space-y-4">
+        <div class="p-4 sm:p-6 space-y-4">
           <!-- Status Badge -->
           <div class="flex items-center justify-between">
             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Status</span>
@@ -329,9 +329,9 @@
           </div>
 
           <!-- Transaction Hash -->
-          <div v-if="selectedTransaction.tx_hash" class="flex items-start justify-between">
+          <div v-if="selectedTransaction.tx_hash" class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Transaction Hash</span>
-            <div class="text-right max-w-xs">
+            <div class="text-left sm:text-right max-w-full sm:max-w-xs">
               <span class="text-xs font-mono text-gray-900 dark:text-white break-all">
                 {{ selectedTransaction.tx_hash }}
               </span>
@@ -374,14 +374,14 @@
           <!-- Notes -->
           <div v-if="selectedTransaction.notes" class="border-t border-gray-200 dark:border-gray-700 pt-4">
             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Notes</span>
-            <p class="mt-2 text-sm text-gray-900 dark:text-white">{{ selectedTransaction.notes }}</p>
+            <p class="mt-2 text-sm text-gray-900 dark:text-white break-words">{{ selectedTransaction.notes }}</p>
           </div>
         </div>
 
-        <div class="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+        <div class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
           <button
             @click="selectedTransaction = null"
-            class="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
+            class="w-full px-4 py-2 text-sm sm:text-base bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
           >
             Close
           </button>
